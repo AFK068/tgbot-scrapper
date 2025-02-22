@@ -54,10 +54,14 @@ generate_openapi:
 	@if ! command -v 'oapi-codegen' &> /dev/null; then \
 		echo "Please install oapi-codegen!"; exit 1; \
 	fi;
-	@mkdir -p internal/api/openapi/v1
+	@mkdir -p internal/api/openapi/scrapper/v1
 	@oapi-codegen -package v1 \
 		-generate server,types \
-		api/openapi/v1/service.yaml > internal/api/openapi/v1/service.gen.go
+		api/openapi/v1/scrapper-api.yaml > internal/api/openapi/scrapper/v1/scrapper-api.gen.go
+	@mkdir -p internal/api/openapi/bot/v1
+	@oapi-codegen -package v1 \
+		-generate server,types \
+		api/openapi/v1/bot-api.yaml > internal/api/openapi/bot/v1/bot-api.gen.go
 
 .PHONY: clean
 clean:
