@@ -94,3 +94,18 @@ func (r *InMemoryChatLinkRepository) CheckUserExistence(chatID int64) bool {
 
 	return false
 }
+
+func (r *InMemoryChatLinkRepository) GetAllLinks() []*domain.Link {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	var allLinks []*domain.Link
+
+	for _, userLinks := range r.links {
+		for _, link := range userLinks {
+			allLinks = append(allLinks, link)
+		}
+	}
+
+	return allLinks
+}
