@@ -21,4 +21,7 @@ type ChatLinkRepository interface {
 
 	// Get all links from the repository.
 	GetAllLinks() []*Link
+
+	// Update time of the last check of the link.
+	UpdateLastCheck(chatID int64, link *Link) error
 }

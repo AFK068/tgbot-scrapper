@@ -8,10 +8,10 @@ var (
 )
 
 type Link struct {
-	ID        int64
+	UserAddID int64
 	URL       string
 	Type      string
 	Tags      []string
 	Filters   []string
-	AddedTime time.Time
+	LastCheck time.Time
 }

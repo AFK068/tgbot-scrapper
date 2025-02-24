@@ -2,6 +2,7 @@ package repository
 
 import (
 	"sync"
+	"time"
 
 	"github.com/AFK068/bot/internal/domain"
 	"github.com/AFK068/bot/internal/domain/apperrors"
@@ -108,4 +109,19 @@ func (r *InMemoryChatLinkRepository) GetAllLinks() []*domain.Link {
 	}
 
 	return allLinks
+}
+
+func (r *InMemoryChatLinkRepository) UpdateLastCheck(link *domain.Link) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	if _, ok := r.links[link.UserAddID][link.URL]; !ok {
+		return &apperrors.LinkIsNotExistError{
+			Message: "Link is not exist",
+		}
+	}
+
+	r.links[link.UserAddID][link.URL].LastCheck = time.Now()
+
+	return nil
 }

@@ -59,7 +59,7 @@ func (h *ScrapperHandler) PostLinks(ctx echo.Context, params api.PostLinksParams
 		return SendBadRequestResponse(ctx, ErrInvalidRequestBody, ErrDescriptionInvalidBody)
 	}
 
-	link, err := mapper.MapAddLinkRequestToDomain(&req)
+	link, err := mapper.MapAddLinkRequestToDomain(params.TgChatId, &req)
 
 	switch {
 	case errors.Is(err, &apperrors.LinkValidateError{}):
@@ -123,7 +123,6 @@ func (h *ScrapperHandler) GetLinks(ctx echo.Context, params api.GetLinksParams) 
 	linksResp := make([]api.LinkResponse, len(links))
 	for i, link := range links {
 		linksResp[i] = api.LinkResponse{
-			Id:      aws.Int64(link.ID),
 			Url:     aws.String(link.URL),
 			Tags:    utils.SlicePtr(link.Tags),
 			Filters: utils.SlicePtr(link.Filters),
