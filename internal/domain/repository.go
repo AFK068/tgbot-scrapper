@@ -18,4 +18,7 @@ type ChatLinkRepository interface {
 
 	// Check if the chat exists in the repository.
 	CheckUserExistence(chatID int64) bool
+
+	// Get all links from the repository.
+	GetAllLinks() []*Link
 }
