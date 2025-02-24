@@ -4,6 +4,7 @@ import (
 	"sync"
 
 	"github.com/AFK068/bot/internal/domain"
+	"github.com/AFK068/bot/internal/domain/apperrors"
 )
 
 type InMemoryChatLinkRepository struct {
@@ -22,7 +23,7 @@ func (r *InMemoryChatLinkRepository) RegisterChat(chatID int64) error {
 	defer r.mu.Unlock()
 
 	if _, ok := r.links[chatID]; ok {
-		return &domain.ChatAlreadyExistError{
+		return &apperrors.ChatAlreadyExistError{
 			Message: "Chat is already exist",
 		}
 	}
@@ -61,7 +62,7 @@ func (r *InMemoryChatLinkRepository) DeleteLink(chatID int64, link *domain.Link)
 	defer r.mu.Unlock()
 
 	if _, ok := r.links[chatID][link.URL]; !ok {
-		return &domain.LinkIsNotExistError{
+		return &apperrors.LinkIsNotExistError{
 			Message: "Link is not exist",
 		}
 	}

@@ -1,4 +1,4 @@
-package domain
+package apperrors
 
 type ChatIsNotExistError struct {
 	Message string

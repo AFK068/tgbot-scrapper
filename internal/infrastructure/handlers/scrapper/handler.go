@@ -5,6 +5,7 @@ import (
 
 	api "github.com/AFK068/bot/internal/api/openapi/scrapper/v1"
 	"github.com/AFK068/bot/internal/domain"
+	"github.com/AFK068/bot/internal/domain/apperrors"
 
 	"github.com/AFK068/bot/pkg/utils"
 	"github.com/aws/aws-sdk-go/aws"
@@ -99,7 +100,7 @@ func (h *ScrapperHandler) DeleteLinks(ctx echo.Context, params api.DeleteLinksPa
 	err := h.repository.DeleteLink(params.TgChatId, link)
 
 	if err != nil {
-		var linkNotExistErr *domain.LinkIsNotExistError
+		var linkNotExistErr *apperrors.LinkIsNotExistError
 		if errors.As(err, &linkNotExistErr) {
 			return SendNotFoundResponse(ctx, ErrLinkNotExist, ErrDescriptionLinkNotExist)
 		}
