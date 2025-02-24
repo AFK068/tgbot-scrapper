@@ -124,8 +124,8 @@ func (h *ScrapperHandler) GetLinks(ctx echo.Context, params api.GetLinksParams) 
 	for i, link := range links {
 		linksResp[i] = api.LinkResponse{
 			Url:     aws.String(link.URL),
-			Tags:    utils.SlicePtr(link.Tags),
-			Filters: utils.SlicePtr(link.Filters),
+			Tags:    utils.SliceStringPtr(link.Tags),
+			Filters: utils.SliceStringPtr(link.Filters),
 		}
 	}
 
