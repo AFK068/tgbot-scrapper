@@ -19,8 +19,13 @@ const (
 	ErrDescriptionInternalError    = "Internal error"
 	ErrDescriptionInvalidBody      = "Invalid request body"
 
-	ErrLinkNotExist            = "link_not_exist"
-	ErrDescriptionLinkNotExist = "Link not exist"
+	ErrLinkNotExist         = "link_not_exist"
+	ErrLinkValidationError  = "link_validation_error"
+	ErrLinkTypeNotSupported = "link_type_not_supported"
+
+	ErrDescriptionLinkNotExist         = "Link not exist"
+	ErrDescriptionLinkValidationError  = "Link validation error"
+	ErrDescriptionLinkTypeNotSupported = "Link type not supported"
 )
 
 func SendSuccessResponse(ctx echo.Context, data any) error {

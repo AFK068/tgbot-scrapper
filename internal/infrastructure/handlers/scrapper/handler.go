@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	api "github.com/AFK068/bot/internal/api/openapi/scrapper/v1"
+	"github.com/AFK068/bot/internal/application/mapper"
 	"github.com/AFK068/bot/internal/domain"
 	"github.com/AFK068/bot/internal/domain/apperrors"
 
@@ -58,20 +59,15 @@ func (h *ScrapperHandler) PostLinks(ctx echo.Context, params api.PostLinksParams
 		return SendBadRequestResponse(ctx, ErrInvalidRequestBody, ErrDescriptionInvalidBody)
 	}
 
-	if req.Link == nil || *req.Link == "" {
+	link, err := mapper.MapAddLinkRequestToDomain(&req)
+
+	switch {
+	case errors.Is(err, &apperrors.LinkValidateError{}):
 		return SendBadRequestResponse(ctx, ErrInvalidRequestBody, ErrDescriptionInvalidBody)
-	}
-
-	link := &domain.Link{
-		URL: *req.Link,
-	}
-
-	if req.Tags != nil {
-		link.Tags = *req.Tags
-	}
-
-	if req.Filters != nil {
-		link.Filters = *req.Filters
+	case errors.Is(err, &apperrors.LinkTypeError{}):
+		return SendBadRequestResponse(ctx, ErrLinkTypeNotSupported, ErrDescriptionLinkTypeNotSupported)
+	case err != nil:
+		return SendBadRequestResponse(ctx, ErrInternalError, ErrDescriptionInternalError)
 	}
 
 	if err := h.repository.SaveLink(params.TgChatId, link); err != nil {
