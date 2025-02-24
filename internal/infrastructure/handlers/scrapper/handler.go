@@ -95,12 +95,10 @@ func (h *ScrapperHandler) DeleteLinks(ctx echo.Context, params api.DeleteLinksPa
 
 	err := h.repository.DeleteLink(params.TgChatId, link)
 
-	if err != nil {
-		var linkNotExistErr *apperrors.LinkIsNotExistError
-		if errors.As(err, &linkNotExistErr) {
-			return SendNotFoundResponse(ctx, ErrLinkNotExist, ErrDescriptionLinkNotExist)
-		}
-
+	switch {
+	case errors.Is(err, &apperrors.LinkIsNotExistError{}):
+		return SendNotFoundResponse(ctx, ErrLinkNotExist, ErrDescriptionLinkNotExist)
+	case err != nil:
 		return SendBadRequestResponse(ctx, ErrInternalError, ErrDescriptionInternalError)
 	}
 
