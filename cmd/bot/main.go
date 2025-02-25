@@ -1,5 +1,55 @@
 package main
 
+import (
+	"github.com/AFK068/bot/config"
+	"github.com/AFK068/bot/internal/bot"
+	"github.com/AFK068/bot/internal/infrastructure/clients/scrapper"
+	handler "github.com/AFK068/bot/internal/infrastructure/handler/bot"
+	"github.com/AFK068/bot/internal/infrastructure/server"
+	"go.uber.org/fx"
+)
+
+const (
+	ConfigPath = "."
+)
+
 func main() {
-	// TODO: write your code here
+	fx.New(
+		fx.Provide(
+			// Provide bot config.
+			func() (*config.BotConfig, error) {
+				botCfg, err := config.NewBotConfig(ConfigPath)
+				if err != nil {
+					return nil, err
+				}
+
+				return botCfg, nil
+			},
+
+			// Provide scrapper client.
+			func(cfg *config.BotConfig) *scrapper.Client {
+				return scrapper.NewClient(cfg.ScrapperURL)
+			},
+
+			// Provide bot.
+			bot.NewBot,
+
+			// Provide bot handler.
+			handler.NewBotHandler,
+
+			// Provide bot server.
+			server.NewBotServer,
+		),
+		fx.Invoke(
+			// Run bot.
+			func(b *bot.Bot) error {
+				return b.Run()
+			},
+
+			// Start bot server.
+			func(s *server.BotServer) error {
+				return s.Start()
+			},
+		),
+	).Run()
 }
