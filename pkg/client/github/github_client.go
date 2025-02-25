@@ -2,13 +2,14 @@ package github
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
 	"regexp"
 	"strings"
 	"time"
+
+	"github.com/go-resty/resty/v2"
 )
 
 const (
@@ -16,49 +17,38 @@ const (
 )
 
 type Client struct {
-	BaseURL    string
-	HTTPClient *http.Client
+	BaseURL string
+	Client  *resty.Client
 }
 
 func NewClient() *Client {
 	return &Client{
 		BaseURL: BaseGitHubAPIURL,
-		HTTPClient: &http.Client{
-			Timeout: 10 * time.Second,
-		},
+		Client:  resty.New().SetTimeout(10 * time.Second),
 	}
 }
 
-func (c *Client) GetRepo(ctx context.Context, url string) (*Repository, error) {
-	ownerName, repoName, err := getOwnerAndRepo(url)
+func (c *Client) GetRepo(ctx context.Context, questionURL string) (*Repository, error) {
+	ownerName, repoName, err := getOwnerAndRepo(questionURL)
 	if err != nil {
 		return nil, err
 	}
 
-	reqURL := fmt.Sprintf("%s/repos/%s/%s", c.BaseURL, ownerName, repoName)
+	url := fmt.Sprintf("%s/repos/%s/%s", c.BaseURL, ownerName, repoName)
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, reqURL, http.NoBody)
+	resp, err := c.Client.R().
+		SetContext(ctx).
+		SetResult(&Repository{}).
+		Get(url)
 	if err != nil {
-		return nil, err
-	}
-
-	res, err := c.HTTPClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-
-	defer res.Body.Close()
-
-	if res.StatusCode != http.StatusOK {
 		return nil, errors.New("failed to get repository")
 	}
 
-	var repo Repository
-	if err := json.NewDecoder(res.Body).Decode(&repo); err != nil {
-		return nil, err
+	if resp.StatusCode() != http.StatusOK {
+		return nil, errors.New("failed to get repository")
 	}
 
-	return &repo, nil
+	return resp.Result().(*Repository), nil
 }
 
 func getOwnerAndRepo(url string) (owner, repo string, err error) {
