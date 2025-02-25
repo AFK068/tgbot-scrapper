@@ -1,5 +1,15 @@
 COVERAGE_FILE ?= coverage.out
 
+.PHONY: run_bot
+run_bot:
+	@echo "Выполняется go run для таргета bot"
+	@go run ./cmd/bot/main.go
+
+.PHONY: run_scrapper
+run_scrapper:
+	@echo "Выполняется go run для таргета scrapper"
+	@go run ./cmd/scrapper/main.go
+
 .PHONY: build
 build: build_bot build_scrapper
 
