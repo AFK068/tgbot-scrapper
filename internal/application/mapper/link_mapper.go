@@ -1,6 +1,7 @@
 package mapper
 
 import (
+	"strings"
 	"time"
 
 	api "github.com/AFK068/bot/internal/api/openapi/scrapper/v1"
@@ -27,10 +28,10 @@ func MapAddLinkRequestToDomain(tgChatID int64, addLinkRequest *api.AddLinkReques
 
 	link.UserAddID = tgChatID
 
-	switch *addLinkRequest.Link {
-	case "https://api.stackexchange.com":
+	switch {
+	case strings.HasPrefix(*addLinkRequest.Link, "https://stackoverflow.com"):
 		link.Type = domain.StackoverflowType
-	case "https://api.github.com":
+	case strings.HasPrefix(*addLinkRequest.Link, "https://github.com"):
 		link.Type = domain.GithubType
 	default:
 		return nil, &apperrors.LinkTypeError{Message: "unsupported link type"}
