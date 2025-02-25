@@ -16,6 +16,10 @@ import (
 	"github.com/go-co-op/gocron/v2"
 )
 
+const (
+	DefaultJobDuration = 10 * time.Minute
+)
+
 type Scheduler struct {
 	scheduler           gocron.Scheduler
 	repository          domain.ChatLinkRepository
@@ -55,7 +59,7 @@ func (s *Scheduler) Run(jobDuration time.Duration) {
 	)
 
 	if err != nil {
-		fmt.Println("failed to create job:", err)
+		return
 	}
 
 	s.scheduler.Start()
