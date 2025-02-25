@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/AFK068/bot/internal/domain"
-	handler "github.com/AFK068/bot/internal/infrastructure/handlers/scrapper"
+	handler "github.com/AFK068/bot/internal/infrastructure/handler/scrapper"
 	"github.com/labstack/echo/v4"
 )
 
