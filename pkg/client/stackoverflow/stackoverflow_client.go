@@ -2,12 +2,13 @@ package stackoverflow
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
 	"regexp"
 	"time"
+
+	"github.com/go-resty/resty/v2"
 )
 
 const (
@@ -15,16 +16,14 @@ const (
 )
 
 type Client struct {
-	BaseURL    string
-	HTTPClient *http.Client
+	BaseURL string
+	Client  *resty.Client
 }
 
 func NewClient() *Client {
 	return &Client{
 		BaseURL: BaseStackOverflowAPIURL,
-		HTTPClient: &http.Client{
-			Timeout: 10 * time.Second,
-		},
+		Client:  resty.New().SetTimeout(10 * time.Second),
 	}
 }
 
@@ -36,27 +35,19 @@ func (c *Client) GetQuestion(ctx context.Context, questionURL string) (*Question
 
 	url := fmt.Sprintf("%s/questions/%s?site=stackoverflow", c.BaseURL, questionID)
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, http.NoBody)
+	resp, err := c.Client.R().
+		SetContext(ctx).
+		SetResult(&QuestionResponse{}).
+		Get(url)
 	if err != nil {
-		return nil, err
-	}
-
-	res, err := c.HTTPClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-
-	defer res.Body.Close()
-
-	if res.StatusCode != http.StatusOK {
 		return nil, errors.New("failed to get question")
 	}
 
-	var response QuestionResponse
-	if err := json.NewDecoder(res.Body).Decode(&response); err != nil {
-		return nil, err
+	if resp.StatusCode() != http.StatusOK {
+		return nil, errors.New("failed to get question")
 	}
 
+	response := resp.Result().(*QuestionResponse)
 	if len(response.Items) == 0 {
 		return nil, errors.New("question not found")
 	}
