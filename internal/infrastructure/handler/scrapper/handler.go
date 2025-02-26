@@ -61,12 +61,17 @@ func (h *ScrapperHandler) PostLinks(ctx echo.Context, params api.PostLinksParams
 
 	link, err := mapper.MapAddLinkRequestToDomain(params.TgChatId, &req)
 
-	switch {
-	case errors.Is(err, &apperrors.LinkValidateError{}):
+	var linkValidateErr *apperrors.LinkValidateError
+	if errors.As(err, &linkValidateErr) {
 		return SendBadRequestResponse(ctx, ErrInvalidRequestBody, ErrDescriptionInvalidBody)
-	case errors.Is(err, &apperrors.LinkTypeError{}):
+	}
+
+	var linkTypeErr *apperrors.LinkTypeError
+	if errors.As(err, &linkTypeErr) {
 		return SendBadRequestResponse(ctx, ErrLinkTypeNotSupported, ErrDescriptionLinkTypeNotSupported)
-	case err != nil:
+	}
+
+	if err != nil {
 		return SendBadRequestResponse(ctx, ErrInternalError, ErrDescriptionInternalError)
 	}
 
@@ -95,10 +100,12 @@ func (h *ScrapperHandler) DeleteLinks(ctx echo.Context, params api.DeleteLinksPa
 
 	err := h.repository.DeleteLink(params.TgChatId, link)
 
-	switch {
-	case errors.Is(err, &apperrors.LinkIsNotExistError{}):
+	var linkNotExistErr *apperrors.LinkIsNotExistError
+	if errors.As(err, &linkNotExistErr) {
 		return SendNotFoundResponse(ctx, ErrLinkNotExist, ErrDescriptionLinkNotExist)
-	case err != nil:
+	}
+
+	if err != nil {
 		return SendBadRequestResponse(ctx, ErrInternalError, ErrDescriptionInternalError)
 	}
 
