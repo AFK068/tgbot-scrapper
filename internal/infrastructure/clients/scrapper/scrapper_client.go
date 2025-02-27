@@ -7,6 +7,7 @@ import (
 
 	api "github.com/AFK068/bot/internal/api/openapi/scrapper/v1"
 	"github.com/go-resty/resty/v2"
+	"github.com/labstack/echo/v4"
 )
 
 type Client struct {
@@ -26,8 +27,8 @@ func (c *Client) PostTgChatID(ctx context.Context, id int64) error {
 
 	resp, err := c.Client.R().
 		SetContext(ctx).
-		SetHeader("Content-Type", "application/json").
-		SetHeader("Accept", "application/json").
+		SetHeader(echo.HeaderContentType, echo.MIMEApplicationJSON).
+		SetHeader(echo.HeaderAccept, echo.MIMEApplicationJSON).
 		Post(url)
 	if err != nil {
 		return fmt.Errorf("failed to do request: %w", err)
@@ -41,8 +42,8 @@ func (c *Client) DeleteTgChatID(ctx context.Context, id int64) error {
 
 	resp, err := c.Client.R().
 		SetContext(ctx).
-		SetHeader("Content-Type", "application/json").
-		SetHeader("Accept", "application/json").
+		SetHeader(echo.HeaderContentType, echo.MIMEApplicationJSON).
+		SetHeader(echo.HeaderAccept, echo.MIMEApplicationJSON).
 		Delete(url)
 	if err != nil {
 		return fmt.Errorf("failed to do request: %w", err)
@@ -56,8 +57,8 @@ func (c *Client) PostLinks(ctx context.Context, tgChatID int64, link api.AddLink
 
 	resp, err := c.Client.R().
 		SetContext(ctx).
-		SetHeader("Content-Type", "application/json").
-		SetHeader("Accept", "application/json").
+		SetHeader(echo.HeaderContentType, echo.MIMEApplicationJSON).
+		SetHeader(echo.HeaderAccept, echo.MIMEApplicationJSON).
 		SetHeader("Tg-Chat-Id", fmt.Sprintf("%d", tgChatID)).
 		SetBody(link).
 		Post(url)
@@ -73,8 +74,8 @@ func (c *Client) DeleteLinks(ctx context.Context, tgChatID int64, link api.Remov
 
 	resp, err := c.Client.R().
 		SetContext(ctx).
-		SetHeader("Content-Type", "application/json").
-		SetHeader("Accept", "application/json").
+		SetHeader(echo.HeaderContentType, echo.MIMEApplicationJSON).
+		SetHeader(echo.HeaderAccept, echo.MIMEApplicationJSON).
 		SetHeader("Tg-Chat-Id", fmt.Sprintf("%d", tgChatID)).
 		SetBody(link).
 		Delete(url)
@@ -90,8 +91,8 @@ func (c *Client) GetLinks(ctx context.Context, tgChatID int64) (api.ListLinksRes
 
 	resp, err := c.Client.R().
 		SetContext(ctx).
-		SetHeader("Content-Type", "application/json").
-		SetHeader("Accept", "application/json").
+		SetHeader(echo.HeaderContentType, echo.MIMEApplicationJSON).
+		SetHeader(echo.HeaderAccept, echo.MIMEApplicationJSON).
 		SetHeader("Tg-Chat-Id", fmt.Sprintf("%d", tgChatID)).
 		Get(url)
 	if err != nil {
