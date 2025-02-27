@@ -8,6 +8,7 @@ import (
 
 	api "github.com/AFK068/bot/internal/api/openapi/bot/v1"
 	"github.com/go-resty/resty/v2"
+	"github.com/labstack/echo/v4"
 )
 
 type Client struct {
@@ -27,8 +28,8 @@ func (c *Client) PostUpdates(ctx context.Context, update api.LinkUpdate) error {
 
 	resp, err := c.Client.R().
 		SetContext(ctx).
-		SetHeader("Content-Type", "application/json").
-		SetHeader("Accept", "application/json").
+		SetHeader(echo.HeaderContentType, echo.MIMEApplicationJSON).
+		SetHeader(echo.HeaderAccept, echo.MIMEApplicationJSON).
 		SetBody(update).
 		Post(url)
 	if err != nil {
