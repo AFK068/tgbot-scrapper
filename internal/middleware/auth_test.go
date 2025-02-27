@@ -5,15 +5,15 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	repomock "github.com/AFK068/bot/internal/domain/mocks"
 	"github.com/AFK068/bot/internal/middleware"
+	checker "github.com/AFK068/bot/internal/middleware/mocks"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestAuthLinkMiddleware_Success(t *testing.T) {
-	repoMock := repomock.NewChatLinkRepository(t)
-	mw := middleware.AuthLinkMiddleware(repoMock)
+	checkerMock := checker.NewUserChecker(t)
+	mw := middleware.AuthLinkMiddleware(checkerMock)
 
 	req := httptest.NewRequest(http.MethodGet, "/links", http.NoBody)
 	rec := httptest.NewRecorder()
@@ -24,7 +24,7 @@ func TestAuthLinkMiddleware_Success(t *testing.T) {
 	c := e.NewContext(req, rec)
 	c.SetPath("/links")
 
-	repoMock.On("CheckUserExistence", int64(1)).Return(true)
+	checkerMock.On("CheckUserExistence", int64(1)).Return(true)
 
 	called := false
 	nextHandler := func(c echo.Context) error {
@@ -37,12 +37,12 @@ func TestAuthLinkMiddleware_Success(t *testing.T) {
 	assert.NoError(t, err)
 	assert.True(t, called)
 	assert.Equal(t, http.StatusOK, rec.Code)
-	repoMock.AssertExpectations(t)
+	checkerMock.AssertExpectations(t)
 }
 
 func TestAuthLinkMiddleware_SkipNonLinksPath(t *testing.T) {
-	repoMock := repomock.NewChatLinkRepository(t)
-	mw := middleware.AuthLinkMiddleware(repoMock)
+	checkerMock := checker.NewUserChecker(t)
+	mw := middleware.AuthLinkMiddleware(checkerMock)
 
 	req := httptest.NewRequest(http.MethodGet, "/other", http.NoBody)
 	rec := httptest.NewRecorder()
@@ -60,12 +60,12 @@ func TestAuthLinkMiddleware_SkipNonLinksPath(t *testing.T) {
 	assert.NoError(t, err)
 	assert.True(t, called)
 	assert.Equal(t, http.StatusOK, rec.Code)
-	repoMock.AssertExpectations(t)
+	checkerMock.AssertExpectations(t)
 }
 
 func TestAuthLinkMiddleware_MissingHeader(t *testing.T) {
-	repoMock := repomock.NewChatLinkRepository(t)
-	mw := middleware.AuthLinkMiddleware(repoMock)
+	checkerMock := checker.NewUserChecker(t)
+	mw := middleware.AuthLinkMiddleware(checkerMock)
 
 	req := httptest.NewRequest(http.MethodGet, "/links", http.NoBody)
 	rec := httptest.NewRecorder()
@@ -78,12 +78,12 @@ func TestAuthLinkMiddleware_MissingHeader(t *testing.T) {
 
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusBadRequest, rec.Code)
-	repoMock.AssertExpectations(t)
+	checkerMock.AssertExpectations(t)
 }
 
 func TestAuthLinkMiddleware_InvalidHeader(t *testing.T) {
-	repoMock := repomock.NewChatLinkRepository(t)
-	mw := middleware.AuthLinkMiddleware(repoMock)
+	checkerMock := checker.NewUserChecker(t)
+	mw := middleware.AuthLinkMiddleware(checkerMock)
 
 	req := httptest.NewRequest(http.MethodGet, "/links", http.NoBody)
 	rec := httptest.NewRecorder()
@@ -98,12 +98,12 @@ func TestAuthLinkMiddleware_InvalidHeader(t *testing.T) {
 
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusBadRequest, rec.Code)
-	repoMock.AssertExpectations(t)
+	checkerMock.AssertExpectations(t)
 }
 
 func TestAuthLinkMiddleware_UserNotExist(t *testing.T) {
-	repoMock := repomock.NewChatLinkRepository(t)
-	mw := middleware.AuthLinkMiddleware(repoMock)
+	checkerMock := checker.NewUserChecker(t)
+	mw := middleware.AuthLinkMiddleware(checkerMock)
 
 	req := httptest.NewRequest(http.MethodGet, "/links", http.NoBody)
 	rec := httptest.NewRecorder()
@@ -114,11 +114,11 @@ func TestAuthLinkMiddleware_UserNotExist(t *testing.T) {
 	c := e.NewContext(req, rec)
 	c.SetPath("/links")
 
-	repoMock.On("CheckUserExistence", int64(123)).Return(false)
+	checkerMock.On("CheckUserExistence", int64(123)).Return(false)
 
 	err := mw(func(_ echo.Context) error { return nil })(c)
 
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusUnauthorized, rec.Code)
-	repoMock.AssertExpectations(t)
+	checkerMock.AssertExpectations(t)
 }
