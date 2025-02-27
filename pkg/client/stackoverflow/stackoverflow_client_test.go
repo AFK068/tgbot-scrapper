@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/AFK068/bot/pkg/client/stackoverflow"
 	"github.com/stretchr/testify/assert"
@@ -13,7 +14,7 @@ import (
 )
 
 func TestGetRepo_Success(t *testing.T) {
-	expectedTime := 123456789
+	expectedTime := time.Unix(123456789, 0)
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "/questions/123", r.URL.Path)
@@ -45,7 +46,7 @@ func TestGetRepo_Success(t *testing.T) {
 	assert.NoError(t, err)
 
 	assert.Equal(t, int64(123), question.QuestionID)
-	assert.Equal(t, int64(expectedTime), question.LastActivityDate)
+	assert.Equal(t, expectedTime.Unix(), question.LastActivityDate)
 }
 
 func TestGetRepo_InvalidLink(t *testing.T) {
