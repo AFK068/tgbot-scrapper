@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	botapi "github.com/AFK068/bot/internal/api/openapi/bot/v1"
-	"github.com/AFK068/bot/internal/bot"
+	"github.com/AFK068/bot/internal/application/bot"
 	"github.com/labstack/echo/v4"
 )
 
@@ -29,7 +29,7 @@ func (h *BotHandler) PostUpdates(ctx echo.Context) error {
 			if linkUpdate.Description != nil {
 				h.Bot.SendMessage(tgChatID, *linkUpdate.Description)
 			} else {
-				h.Bot.SendMessage(tgChatID, fmt.Sprintf("Link updated:%s", *linkUpdate.Url))
+				h.Bot.SendMessage(tgChatID, fmt.Sprintf("Link updated: %s", *linkUpdate.Url))
 			}
 		}
 	}

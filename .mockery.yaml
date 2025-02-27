@@ -1,5 +1,8 @@
 with-expecter: true
+dir: "{{.InterfaceDir}}/mocks"
 filename: "{{.InterfaceName | snakecase}}.go"
 mockname: "{{.InterfaceName | firstUpper}}"
 outpkg: mocks
 packages:
+  "github.com/AFK068/bot/internal/domain":
+    all: true

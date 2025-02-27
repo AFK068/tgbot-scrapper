@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/AFK068/bot/config"
-	"github.com/AFK068/bot/internal/bot"
+	"github.com/AFK068/bot/internal/application/bot"
 	"github.com/AFK068/bot/internal/infrastructure/clients/scrapper"
 	handler "github.com/AFK068/bot/internal/infrastructure/handler/bot"
 	"github.com/AFK068/bot/internal/infrastructure/server"
