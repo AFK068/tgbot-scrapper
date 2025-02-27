@@ -17,8 +17,7 @@ func TestPostTgChatID(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodPost, r.Method)
 
-		expectedPath := "/tg-chat/123"
-		assert.Equal(t, expectedPath, r.URL.Path)
+		assert.Equal(t, "/tg-chat/123", r.URL.Path)
 
 		assert.Equal(t, r.Header.Get("Content-Type"), "application/json")
 		assert.Equal(t, r.Header.Get("Accept"), "application/json")
@@ -37,8 +36,7 @@ func TestDeleteTgChatID(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodDelete, r.Method)
 
-		expectedPath := "/tg-chat/123"
-		assert.Equal(t, expectedPath, r.URL.Path)
+		assert.Equal(t, "/tg-chat/123", r.URL.Path)
 
 		assert.Equal(t, r.Header.Get("Content-Type"), "application/json")
 		assert.Equal(t, r.Header.Get("Accept"), "application/json")
@@ -63,11 +61,9 @@ func TestPostLinks(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodPost, r.Method)
 
-		expectedPath := "/links"
-		assert.Equal(t, expectedPath, r.URL.Path)
+		assert.Equal(t, "/links", r.URL.Path)
 
-		tgHeader := "Tg-Chat-ID"
-		assert.Equal(t, r.Header.Get(tgHeader), "123")
+		assert.Equal(t, r.Header.Get("Tg-Chat-ID"), "123")
 
 		assert.Equal(t, r.Header.Get("Content-Type"), "application/json")
 		assert.Equal(t, r.Header.Get("Accept"), "application/json")
@@ -96,11 +92,9 @@ func TestDeleteLinks(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodDelete, r.Method)
 
-		expectedPath := "/links"
-		assert.Equal(t, expectedPath, r.URL.Path)
+		assert.Equal(t, "/links", r.URL.Path)
 
-		tgHeader := "Tg-Chat-ID"
-		assert.Equal(t, r.Header.Get(tgHeader), "123")
+		assert.Equal(t, r.Header.Get("Tg-Chat-ID"), "123")
 
 		assert.Equal(t, r.Header.Get("Content-Type"), "application/json")
 		assert.Equal(t, r.Header.Get("Accept"), "application/json")
@@ -136,11 +130,9 @@ func TestGetLinks(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
 
-		expectedPath := "/links"
-		assert.Equal(t, expectedPath, r.URL.Path)
+		assert.Equal(t, "/links", r.URL.Path)
 
-		tgHeader := "Tg-Chat-ID"
-		assert.Equal(t, r.Header.Get(tgHeader), "123")
+		assert.Equal(t, r.Header.Get("Tg-Chat-ID"), "123")
 
 		assert.Equal(t, r.Header.Get("Content-Type"), "application/json")
 		assert.Equal(t, r.Header.Get("Accept"), "application/json")
