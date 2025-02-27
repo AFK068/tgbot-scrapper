@@ -8,6 +8,11 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
+type Service interface {
+	Run() error
+	SendMessage(chatID int64, text string)
+}
+
 type Bot struct {
 	API            *tgbotapi.BotAPI
 	Config         *config.BotConfig
@@ -39,6 +44,13 @@ func (b *Bot) Run() error {
 	return nil
 }
 
+func (b *Bot) SendMessage(chatID int64, text string) {
+	msg := tgbotapi.NewMessage(chatID, text)
+	if _, err := b.API.Send(msg); err != nil {
+		fmt.Printf("Ошибка отправки сообщения: %v\n", err)
+	}
+}
+
 func (b *Bot) processUpdates(updates tgbotapi.UpdatesChannel) {
 	for update := range updates {
 		if update.Message == nil {
@@ -62,13 +74,6 @@ func (b *Bot) setBotAPI() error {
 	b.API = botAPI
 
 	return nil
-}
-
-func (b *Bot) SendMessage(chatID int64, text string) {
-	msg := tgbotapi.NewMessage(chatID, text)
-	if _, err := b.API.Send(msg); err != nil {
-		fmt.Printf("Ошибка отправки сообщения: %v\n", err)
-	}
 }
 
 func (b *Bot) initUpdatesChannel() tgbotapi.UpdatesChannel {
