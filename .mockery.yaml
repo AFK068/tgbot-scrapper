@@ -6,3 +6,7 @@ outpkg: mocks
 packages:
   "github.com/AFK068/bot/internal/domain":
     all: true
+  "github.com/AFK068/bot/internal/middleware":
+    all: true
+  "github.com/AFK068/bot/internal/application/bot":
+    all: true

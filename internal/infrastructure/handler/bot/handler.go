@@ -9,10 +9,10 @@ import (
 )
 
 type BotHandler struct {
-	Bot *bot.Bot
+	Bot bot.Service
 }
 
-func NewBotHandler(b *bot.Bot) *BotHandler {
+func NewBotHandler(b bot.Service) *BotHandler {
 	return &BotHandler{
 		Bot: b,
 	}
@@ -24,13 +24,19 @@ func (h *BotHandler) PostUpdates(ctx echo.Context) error {
 		return SendBadRequestResponse(ctx, ErrInvalidRequestBody, ErrDescriptionInvalidBody)
 	}
 
-	if linkUpdate.TgChatIds != nil {
-		for _, tgChatID := range *linkUpdate.TgChatIds {
-			if linkUpdate.Description != nil {
-				h.Bot.SendMessage(tgChatID, *linkUpdate.Description)
-			} else {
-				h.Bot.SendMessage(tgChatID, fmt.Sprintf("Link updated: %s", *linkUpdate.Url))
-			}
+	if linkUpdate.TgChatIds == nil || len(*linkUpdate.TgChatIds) == 0 {
+		return SendBadRequestResponse(ctx, ErrTgChatsIDIsEmpty, ErrTgChatsIDIsEmptyDescription)
+	}
+
+	if linkUpdate.Url == nil || *linkUpdate.Url == "" {
+		return SendBadRequestResponse(ctx, ErrLinkIsEmpty, ErrLinkIsEmptyDescription)
+	}
+
+	for _, tgChatID := range *linkUpdate.TgChatIds {
+		if linkUpdate.Description != nil && *linkUpdate.Description != "" {
+			h.Bot.SendMessage(tgChatID, fmt.Sprintf("Link updated: %s\nDescription: %s", *linkUpdate.Url, *linkUpdate.Description))
+		} else {
+			h.Bot.SendMessage(tgChatID, fmt.Sprintf("Link updated: %s", *linkUpdate.Url))
 		}
 	}
 

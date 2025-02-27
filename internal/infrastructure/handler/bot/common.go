@@ -9,8 +9,13 @@ import (
 )
 
 const (
-	ErrInvalidRequestBody     = "invalid_request_body"
-	ErrDescriptionInvalidBody = "Invalid request body"
+	ErrInvalidRequestBody = "invalid_request_body"
+	ErrTgChatsIDIsEmpty   = "tg_chats_id_is_empty"
+	ErrLinkIsEmpty        = "link_is_empty"
+
+	ErrDescriptionInvalidBody      = "Invalid request body"
+	ErrTgChatsIDIsEmptyDescription = "Tg chats id is empty"
+	ErrLinkIsEmptyDescription      = "Link is empty"
 )
 
 func SendSuccessResponse(ctx echo.Context, data any) error {
