@@ -10,6 +10,14 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+type Service interface {
+	PostTgChatID(ctx context.Context, id int64) error
+	DeleteTgChatID(ctx context.Context, id int64) error
+	PostLinks(ctx context.Context, tgChatID int64, link api.AddLinkRequest) error
+	DeleteLinks(ctx context.Context, tgChatID int64, link api.RemoveLinkRequest) error
+	GetLinks(ctx context.Context, tgChatID int64) (api.ListLinksResponse, error)
+}
+
 type Client struct {
 	BaseURL string
 	Client  *resty.Client
