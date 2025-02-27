@@ -15,6 +15,10 @@ const (
 	BaseStackOverflowAPIURL = "https://api.stackexchange.com/2.2"
 )
 
+type QuestionFetcher interface {
+	GetQuestion(ctx context.Context, questionURL string) (*Question, error)
+}
+
 type Client struct {
 	BaseURL string
 	Client  *resty.Client

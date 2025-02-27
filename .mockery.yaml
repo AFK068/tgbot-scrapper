@@ -10,3 +10,7 @@ packages:
     all: true
   "github.com/AFK068/bot/internal/application/bot":
     all: true
+  "github.com/AFK068/bot/pkg/client/github":
+    all: true
+  "github.com/AFK068/bot/pkg/client/stackoverflow":
+    all: true
