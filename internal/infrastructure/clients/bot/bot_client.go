@@ -11,6 +11,10 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+type Service interface {
+	PostUpdates(ctx context.Context, update api.LinkUpdate) error
+}
+
 type Client struct {
 	BaseURL string
 	Client  *resty.Client
