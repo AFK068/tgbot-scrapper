@@ -14,16 +14,16 @@ import (
 type ScrapperServer struct {
 	Config    *config.ScrapperConfig
 	Handler   *handler.ScrapperHandler
-	Repo      domain.ChatLinkRepository
-	Scheduler *scrapper.Scheduler
+	Scheduler *scrapper.Scrapper
 	Echo      *echo.Echo
+	Repo      domain.ChatLinkRepository
 }
 
 func NewScrapperServer(
 	cfg *config.ScrapperConfig,
 	repo domain.ChatLinkRepository,
 	hd *handler.ScrapperHandler,
-	sd *scrapper.Scheduler,
+	sd *scrapper.Scrapper,
 ) *ScrapperServer {
 	return &ScrapperServer{
 		Echo:      echo.New(),

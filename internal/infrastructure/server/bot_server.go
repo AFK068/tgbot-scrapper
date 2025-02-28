@@ -11,11 +11,11 @@ import (
 type BotServer struct {
 	Config  *config.BotConfig
 	Handler *handler.BotHandler
-	Bot     *bot.Bot
 	Echo    *echo.Echo
+	Bot     bot.Service
 }
 
-func NewBotServer(cfg *config.BotConfig, b *bot.Bot, hd *handler.BotHandler) *BotServer {
+func NewBotServer(cfg *config.BotConfig, b bot.Service, hd *handler.BotHandler) *BotServer {
 	return &BotServer{
 		Config:  cfg,
 		Handler: hd,

@@ -20,26 +20,26 @@ const (
 	DefaultJobDuration = 10 * time.Minute
 )
 
-type Scheduler struct {
+type Scrapper struct {
 	scheduler           gocron.Scheduler
 	repository          domain.ChatLinkRepository
-	stackOverflowClient *stackoverflow.Client
-	gitHubClient        *github.Client
-	botClient           *bot.Client
+	stackOverflowClient stackoverflow.QuestionFetcher
+	gitHubClient        github.RepoFetcher
+	botClient           bot.Service
 }
 
 func NewScrapperScheduler(
 	repository domain.ChatLinkRepository,
-	stackoverflowClient *stackoverflow.Client,
-	githubClient *github.Client,
-	botClient *bot.Client,
-) (*Scheduler, error) {
+	stackoverflowClient stackoverflow.QuestionFetcher,
+	githubClient github.RepoFetcher,
+	botClient bot.Service,
+) (*Scrapper, error) {
 	scheduler, err := gocron.NewScheduler()
 	if err != nil {
 		return nil, fmt.Errorf("failed to create scheduler: %w", err)
 	}
 
-	return &Scheduler{
+	return &Scrapper{
 		scheduler:           scheduler,
 		repository:          repository,
 		stackOverflowClient: stackoverflowClient,
@@ -48,7 +48,7 @@ func NewScrapperScheduler(
 	}, nil
 }
 
-func (s *Scheduler) Run(jobDuration time.Duration) {
+func (s *Scrapper) Run(jobDuration time.Duration) {
 	_, err := s.scheduler.NewJob(
 		gocron.DurationJob(
 			jobDuration,
@@ -65,15 +65,7 @@ func (s *Scheduler) Run(jobDuration time.Duration) {
 	s.scheduler.Start()
 }
 
-func (s *Scheduler) Stop() error {
-	if err := s.scheduler.Shutdown(); err != nil {
-		return fmt.Errorf("failed to shutdown scheduler: %w", err)
-	}
-
-	return nil
-}
-
-func (s *Scheduler) notifyBot(ctx context.Context, link *domain.Link) error {
+func (s *Scrapper) notifyBot(ctx context.Context, link *domain.Link) error {
 	update := botapi.LinkUpdate{
 		Url:       &link.URL,
 		TgChatIds: utils.SliceInt64Ptr(s.repository.GetChatIDsByLink(link)),
@@ -86,7 +78,7 @@ func (s *Scheduler) notifyBot(ctx context.Context, link *domain.Link) error {
 	return nil
 }
 
-func (s *Scheduler) checkLinkForUpdate(ctx context.Context, link *domain.Link) (bool, error) {
+func (s *Scrapper) checkLinkForUpdate(ctx context.Context, link *domain.Link) (bool, error) {
 	switch link.Type {
 	case domain.StackoverflowType:
 		question, err := s.stackOverflowClient.GetQuestion(ctx, link.URL)
@@ -107,7 +99,7 @@ func (s *Scheduler) checkLinkForUpdate(ctx context.Context, link *domain.Link) (
 	}
 }
 
-func (s *Scheduler) scrappeLinksTask() {
+func (s *Scrapper) scrappeLinksTask() {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
