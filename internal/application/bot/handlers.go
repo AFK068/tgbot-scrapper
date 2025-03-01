@@ -2,10 +2,13 @@ package bot
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"net/http"
 	"strings"
 
 	api "github.com/AFK068/bot/internal/api/openapi/scrapper/v1"
+	"github.com/AFK068/bot/internal/domain/apperrors"
 	"github.com/AFK068/bot/pkg/utils"
 	"github.com/aws/aws-sdk-go/aws"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
@@ -95,11 +98,7 @@ func (b *Bot) handleMessage(msg *tgbotapi.Message) {
 		}
 
 	case StateAwaitingTags:
-		if text == SkipOption {
-			return
-		}
-
-		if text != "" {
+		if text != "" && text != SkipOption {
 			conv.Tags = strings.Split(text, " ")
 		}
 
@@ -111,11 +110,7 @@ func (b *Bot) handleMessage(msg *tgbotapi.Message) {
 		b.SendMessage(chatID, "Enter filters separated by spaces (optional):", skipKeyboard)
 
 	case StateAwaitingFilter:
-		if text == SkipOption {
-			return
-		}
-
-		if text != "" {
+		if text != "" && text != SkipOption {
 			conv.Filters = strings.Split(text, " ")
 		}
 
@@ -126,7 +121,7 @@ func (b *Bot) handleMessage(msg *tgbotapi.Message) {
 		})
 
 		if err != nil {
-			b.SendMessage(chatID, "Error adding link. Please try again later.", mainKeyboard)
+			b.handleError(chatID, err)
 		} else {
 			b.SendMessage(chatID, "Link successfully added!", mainKeyboard)
 		}
@@ -159,7 +154,7 @@ func (b *Bot) handleUntrack(chatID int64, link string) {
 	if err := b.ScrapperClient.DeleteLinks(context.Background(), chatID, api.RemoveLinkRequest{
 		Link: aws.String(link),
 	}); err != nil {
-		b.SendMessage(chatID, "Error removing link. Please try again later.", mainKeyboard)
+		b.handleError(chatID, err)
 	} else {
 		b.SendMessage(chatID, "Link successfully removed from tracking!", mainKeyboard)
 	}
@@ -168,7 +163,7 @@ func (b *Bot) handleUntrack(chatID int64, link string) {
 func (b *Bot) handleList(chatID int64) {
 	links, err := b.ScrapperClient.GetLinks(context.Background(), chatID)
 	if err != nil {
-		b.SendMessage(chatID, "Error retrieving list of links.")
+		b.handleError(chatID, err)
 		return
 	}
 
@@ -190,7 +185,7 @@ func (b *Bot) handleList(chatID int64) {
 
 func (b *Bot) handleStart(chatID int64) {
 	if err := b.ScrapperClient.PostTgChatID(context.Background(), chatID); err != nil {
-		b.SendMessage(chatID, "Registration error. Please try again later.")
+		b.handleError(chatID, err)
 		return
 	}
 
@@ -212,4 +207,22 @@ func (b *Bot) handleHelp(chatID int64) {
 	)
 
 	b.SendMessage(chatID, helpText, mainKeyboard)
+}
+
+func (b *Bot) handleError(chatID int64, err error) {
+	var errResp *apperrors.ErrorResponse
+	if errors.As(err, &errResp) {
+		switch errResp.Code {
+		case http.StatusBadRequest:
+			b.SendMessage(chatID, fmt.Sprintf("❌ Request error: %s", errResp.Message))
+		case http.StatusNotFound:
+			b.SendMessage(chatID, fmt.Sprintf("🔍 Not found: %s", errResp.Message))
+		case http.StatusUnauthorized:
+			b.SendMessage(chatID, fmt.Sprintf("❌ Unauthorized access: %s", errResp.Message))
+		default:
+			b.SendMessage(chatID, "⚠️ An internal error occurred")
+		}
+	} else {
+		b.SendMessage(chatID, "⚠️ An internal error occurred")
+	}
 }
