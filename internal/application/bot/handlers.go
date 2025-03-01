@@ -26,6 +26,27 @@ const (
 
 	ListCommand            = "list"
 	ListCommandDescription = "Show list of tracked links"
+
+	SkipOption = "Skip"
+)
+
+var (
+	mainKeyboard = tgbotapi.NewReplyKeyboard(
+		tgbotapi.NewKeyboardButtonRow(
+			tgbotapi.NewKeyboardButton("/"+TrackCommand),
+			tgbotapi.NewKeyboardButton("/"+ListCommand),
+		),
+		tgbotapi.NewKeyboardButtonRow(
+			tgbotapi.NewKeyboardButton("/"+HelpCommand),
+			tgbotapi.NewKeyboardButton("/"+UntrackCommand),
+		),
+	)
+
+	skipKeyboard = tgbotapi.NewReplyKeyboard(
+		tgbotapi.NewKeyboardButtonRow(
+			tgbotapi.NewKeyboardButton(SkipOption),
+		),
+	)
 )
 
 func (b *Bot) handleCommand(msg *tgbotapi.Message) {
@@ -68,12 +89,16 @@ func (b *Bot) handleMessage(msg *tgbotapi.Message) {
 				return
 			}
 
-			b.SendMessage(chatID, "Enter tags separated by spaces (optional):")
+			b.SendMessage(chatID, "Enter tags separated by spaces (optional):", skipKeyboard)
 		} else {
 			b.SendMessage(chatID, "Invalid link. Please try again:")
 		}
 
 	case StateAwaitingTags:
+		if text == SkipOption {
+			return
+		}
+
 		if text != "" {
 			conv.Tags = strings.Split(text, " ")
 		}
@@ -83,9 +108,13 @@ func (b *Bot) handleMessage(msg *tgbotapi.Message) {
 			return
 		}
 
-		b.SendMessage(chatID, "Enter filters separated by spaces (optional):")
+		b.SendMessage(chatID, "Enter filters separated by spaces (optional):", skipKeyboard)
 
 	case StateAwaitingFilter:
+		if text == SkipOption {
+			return
+		}
+
 		if text != "" {
 			conv.Filters = strings.Split(text, " ")
 		}
@@ -97,13 +126,13 @@ func (b *Bot) handleMessage(msg *tgbotapi.Message) {
 		})
 
 		if err != nil {
-			b.SendMessage(chatID, "Error adding link. Please try again later.")
+			b.SendMessage(chatID, "Error adding link. Please try again later.", mainKeyboard)
 		} else {
-			b.SendMessage(chatID, "Link successfully added!")
+			b.SendMessage(chatID, "Link successfully added!", mainKeyboard)
 		}
 
 		if err := conv.FSM.Event(context.Background(), "complete"); err != nil {
-			b.SendMessage(chatID, "Error completing tracking. Please try again later.")
+			b.SendMessage(chatID, "Error completing tracking. Please try again later.", mainKeyboard)
 		}
 
 		b.StateManager.ClearConversation(chatID)
@@ -118,21 +147,21 @@ func (b *Bot) startTrackConversation(chatID int64) {
 		return
 	}
 
-	b.SendMessage(chatID, "Enter the link to track:")
+	b.SendMessage(chatID, "Enter the link to track:", tgbotapi.NewRemoveKeyboard(true))
 }
 
 func (b *Bot) handleUntrack(chatID int64, link string) {
 	if link == "" {
-		b.SendMessage(chatID, "Specify the link to stop tracking: /untrack <link>")
+		b.SendMessage(chatID, "Specify the link to stop tracking: /untrack <link>", tgbotapi.NewRemoveKeyboard(true))
 		return
 	}
 
 	if err := b.ScrapperClient.DeleteLinks(context.Background(), chatID, api.RemoveLinkRequest{
 		Link: aws.String(link),
 	}); err != nil {
-		b.SendMessage(chatID, "Error removing link. Please try again later.")
+		b.SendMessage(chatID, "Error removing link. Please try again later.", mainKeyboard)
 	} else {
-		b.SendMessage(chatID, "Link successfully removed from tracking!")
+		b.SendMessage(chatID, "Link successfully removed from tracking!", mainKeyboard)
 	}
 }
 
@@ -165,7 +194,7 @@ func (b *Bot) handleStart(chatID int64) {
 		return
 	}
 
-	b.SendMessage(chatID, "Welcome! Use /help for a list of commands.")
+	b.SendMessage(chatID, "Welcome! Use /help for a list of commands.", mainKeyboard)
 }
 
 func (b *Bot) handleHelp(chatID int64) {
@@ -182,5 +211,5 @@ func (b *Bot) handleHelp(chatID int64) {
 		ListCommand, ListCommandDescription,
 	)
 
-	b.SendMessage(chatID, helpText)
+	b.SendMessage(chatID, helpText, mainKeyboard)
 }

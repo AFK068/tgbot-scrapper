@@ -10,7 +10,7 @@ import (
 
 type Service interface {
 	Run() error
-	SendMessage(chatID int64, text string)
+	SendMessage(chatID int64, text string, replyMarkup ...interface{})
 }
 
 type Bot struct {

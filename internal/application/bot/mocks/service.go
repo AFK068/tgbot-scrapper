@@ -62,9 +62,12 @@ func (_c *Service_Run_Call) RunAndReturn(run func() error) *Service_Run_Call {
 	return _c
 }
 
-// SendMessage provides a mock function with given fields: chatID, text
-func (_m *Service) SendMessage(chatID int64, text string) {
-	_m.Called(chatID, text)
+// SendMessage provides a mock function with given fields: chatID, text, replyMarkup
+func (_m *Service) SendMessage(chatID int64, text string, replyMarkup ...interface{}) {
+	var _ca []interface{}
+	_ca = append(_ca, chatID, text)
+	_ca = append(_ca, replyMarkup...)
+	_m.Called(_ca...)
 }
 
 // Service_SendMessage_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'SendMessage'
@@ -75,13 +78,21 @@ type Service_SendMessage_Call struct {
 // SendMessage is a helper method to define mock.On call
 //   - chatID int64
 //   - text string
-func (_e *Service_Expecter) SendMessage(chatID interface{}, text interface{}) *Service_SendMessage_Call {
-	return &Service_SendMessage_Call{Call: _e.mock.On("SendMessage", chatID, text)}
+//   - replyMarkup ...interface{}
+func (_e *Service_Expecter) SendMessage(chatID interface{}, text interface{}, replyMarkup ...interface{}) *Service_SendMessage_Call {
+	return &Service_SendMessage_Call{Call: _e.mock.On("SendMessage",
+		append([]interface{}{chatID, text}, replyMarkup...)...)}
 }
 
-func (_c *Service_SendMessage_Call) Run(run func(chatID int64, text string)) *Service_SendMessage_Call {
+func (_c *Service_SendMessage_Call) Run(run func(chatID int64, text string, replyMarkup ...interface{})) *Service_SendMessage_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(int64), args[1].(string))
+		variadicArgs := make([]interface{}, len(args)-2)
+		for i, a := range args[2:] {
+			if a != nil {
+				variadicArgs[i] = a.(interface{})
+			}
+		}
+		run(args[0].(int64), args[1].(string), variadicArgs...)
 	})
 	return _c
 }
@@ -91,7 +102,7 @@ func (_c *Service_SendMessage_Call) Return() *Service_SendMessage_Call {
 	return _c
 }
 
-func (_c *Service_SendMessage_Call) RunAndReturn(run func(int64, string)) *Service_SendMessage_Call {
+func (_c *Service_SendMessage_Call) RunAndReturn(run func(int64, string, ...interface{})) *Service_SendMessage_Call {
 	_c.Call.Return(run)
 	return _c
 }
