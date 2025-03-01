@@ -218,6 +218,45 @@ func TestPostLinks_Failure(t *testing.T) {
 	repoMock.AssertExpectations(t)
 }
 
+func TestPostLinks_DuplicateLink(t *testing.T) {
+	repoMock := repomock.NewChatLinkRepository(t)
+	h := handler.NewScrapperHandler(repoMock)
+
+	body := scrapperapi.AddLinkRequest{
+		Link: aws.String("https://github.com"),
+	}
+
+	repoMock.On("SaveLink", int64(123), mock.AnythingOfType("*domain.Link")).Return(nil).Twice()
+
+	// First request.
+	reqBody1, err := json.Marshal(body)
+	assert.NoError(t, err)
+
+	req1 := httptest.NewRequest(http.MethodPost, "/links?TgChatId=123", bytes.NewReader(reqBody1))
+	req1.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+
+	rec1 := httptest.NewRecorder()
+	c1 := echo.New().NewContext(req1, rec1)
+	err = h.PostLinks(c1, scrapperapi.PostLinksParams{TgChatId: 123})
+	assert.NoError(t, err)
+	assert.Equal(t, http.StatusOK, rec1.Code)
+
+	// Second request.
+	reqBody2, err := json.Marshal(body)
+	assert.NoError(t, err)
+
+	req2 := httptest.NewRequest(http.MethodPost, "/links?TgChatId=123", bytes.NewReader(reqBody2))
+	req2.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+
+	rec2 := httptest.NewRecorder()
+	c2 := echo.New().NewContext(req2, rec2)
+	err = h.PostLinks(c2, scrapperapi.PostLinksParams{TgChatId: 123})
+	assert.NoError(t, err)
+	assert.Equal(t, http.StatusOK, rec2.Code)
+
+	repoMock.AssertExpectations(t)
+}
+
 func TestDeleteLinks_Success(t *testing.T) {
 	repoMock := repomock.NewChatLinkRepository(t)
 	h := handler.NewScrapperHandler(repoMock)
