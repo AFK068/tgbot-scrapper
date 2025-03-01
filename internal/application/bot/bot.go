@@ -44,8 +44,23 @@ func (b *Bot) Run() error {
 	return nil
 }
 
-func (b *Bot) SendMessage(chatID int64, text string) {
+func (b *Bot) SendMessage(chatID int64, text string, replyMarkup ...interface{}) {
 	msg := tgbotapi.NewMessage(chatID, text)
+
+	if len(replyMarkup) > 0 {
+		if keyboard, ok := replyMarkup[0].(tgbotapi.ReplyKeyboardMarkup); ok {
+			msg.ReplyMarkup = keyboard
+		}
+
+		if keyboard, ok := replyMarkup[0].(tgbotapi.InlineKeyboardMarkup); ok {
+			msg.ReplyMarkup = keyboard
+		}
+
+		if _, ok := replyMarkup[0].(tgbotapi.ReplyKeyboardRemove); ok {
+			msg.ReplyMarkup = tgbotapi.NewRemoveKeyboard(true)
+		}
+	}
+
 	if _, err := b.API.Send(msg); err != nil {
 		fmt.Printf("Ошибка отправки сообщения: %v\n", err)
 	}
