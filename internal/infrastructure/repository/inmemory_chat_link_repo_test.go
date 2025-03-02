@@ -4,10 +4,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/AFK068/bot/internal/domain"
 	"github.com/AFK068/bot/internal/domain/apperrors"
 	"github.com/AFK068/bot/internal/infrastructure/repository"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestRegisterChat(t *testing.T) {

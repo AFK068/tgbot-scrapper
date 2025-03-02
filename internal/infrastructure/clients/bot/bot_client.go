@@ -6,10 +6,12 @@ import (
 	"fmt"
 	"net/http"
 
-	api "github.com/AFK068/bot/internal/api/openapi/bot/v1"
-	"github.com/AFK068/bot/internal/infrastructure/logger"
 	"github.com/go-resty/resty/v2"
 	"github.com/labstack/echo/v4"
+
+	"github.com/AFK068/bot/internal/infrastructure/logger"
+
+	api "github.com/AFK068/bot/internal/api/openapi/bot/v1"
 )
 
 type Service interface {

@@ -7,11 +7,13 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	api "github.com/AFK068/bot/internal/api/openapi/bot/v1"
-	"github.com/AFK068/bot/internal/infrastructure/clients/bot"
-	"github.com/AFK068/bot/internal/infrastructure/logger"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/AFK068/bot/internal/infrastructure/clients/bot"
+	"github.com/AFK068/bot/internal/infrastructure/logger"
+
+	api "github.com/AFK068/bot/internal/api/openapi/bot/v1"
 )
 
 func TestPostUpdates(t *testing.T) {

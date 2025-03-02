@@ -3,9 +3,10 @@ package handler
 import (
 	"net/http"
 
-	api "github.com/AFK068/bot/internal/api/openapi/scrapper/v1"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/labstack/echo/v4"
+
+	api "github.com/AFK068/bot/internal/api/openapi/scrapper/v1"
 )
 
 const (

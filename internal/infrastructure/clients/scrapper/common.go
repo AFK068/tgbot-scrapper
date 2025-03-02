@@ -4,8 +4,9 @@ import (
 	"encoding/json"
 	"net/http"
 
-	api "github.com/AFK068/bot/internal/api/openapi/scrapper/v1"
 	"github.com/AFK068/bot/internal/domain/apperrors"
+
+	api "github.com/AFK068/bot/internal/api/openapi/scrapper/v1"
 )
 
 func (c *Client) handleResponse(code int, body []byte) error {

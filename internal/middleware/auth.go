@@ -4,9 +4,11 @@ import (
 	"strconv"
 	"strings"
 
-	handler "github.com/AFK068/bot/internal/infrastructure/handler/scrapper"
-	"github.com/AFK068/bot/internal/infrastructure/logger"
 	"github.com/labstack/echo/v4"
+
+	"github.com/AFK068/bot/internal/infrastructure/logger"
+
+	handler "github.com/AFK068/bot/internal/infrastructure/handler/scrapper"
 )
 
 const (

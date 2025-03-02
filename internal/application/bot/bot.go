@@ -3,10 +3,11 @@ package bot
 import (
 	"fmt"
 
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+
 	"github.com/AFK068/bot/config"
 	"github.com/AFK068/bot/internal/infrastructure/clients/scrapper"
 	"github.com/AFK068/bot/internal/infrastructure/logger"
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
 type Service interface {

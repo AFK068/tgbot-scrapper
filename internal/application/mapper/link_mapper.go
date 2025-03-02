@@ -4,9 +4,10 @@ import (
 	"strings"
 	"time"
 
-	api "github.com/AFK068/bot/internal/api/openapi/scrapper/v1"
 	"github.com/AFK068/bot/internal/domain"
 	"github.com/AFK068/bot/internal/domain/apperrors"
+
+	api "github.com/AFK068/bot/internal/api/openapi/scrapper/v1"
 )
 
 func MapAddLinkRequestToDomain(tgChatID int64, addLinkRequest *api.AddLinkRequest) (*domain.Link, error) {

@@ -7,11 +7,14 @@ import (
 	"net/http"
 	"strings"
 
-	api "github.com/AFK068/bot/internal/api/openapi/scrapper/v1"
+	"github.com/aws/aws-sdk-go/aws"
+
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+
 	"github.com/AFK068/bot/internal/domain/apperrors"
 	"github.com/AFK068/bot/pkg/utils"
-	"github.com/aws/aws-sdk-go/aws"
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+
+	api "github.com/AFK068/bot/internal/api/openapi/scrapper/v1"
 )
 
 const (

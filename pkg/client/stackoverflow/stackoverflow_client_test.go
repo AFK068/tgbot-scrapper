@@ -8,9 +8,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/AFK068/bot/pkg/client/stackoverflow"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/AFK068/bot/pkg/client/stackoverflow"
 )
 
 func TestGetRepo_Success(t *testing.T) {

@@ -4,18 +4,20 @@ import (
 	"testing"
 	"time"
 
-	botapi "github.com/AFK068/bot/internal/api/openapi/bot/v1"
-	"github.com/AFK068/bot/internal/application/scrapper"
-	"github.com/AFK068/bot/internal/domain"
-	repoMock "github.com/AFK068/bot/internal/domain/mocks"
-	botMock "github.com/AFK068/bot/internal/infrastructure/clients/bot/mocks"
-	"github.com/AFK068/bot/internal/infrastructure/logger"
-	"github.com/AFK068/bot/pkg/client/github"
-	githubMock "github.com/AFK068/bot/pkg/client/github/mocks"
-	"github.com/AFK068/bot/pkg/client/stackoverflow"
-	stackoverflowMock "github.com/AFK068/bot/pkg/client/stackoverflow/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+
+	"github.com/AFK068/bot/internal/application/scrapper"
+	"github.com/AFK068/bot/internal/domain"
+	"github.com/AFK068/bot/internal/infrastructure/logger"
+	"github.com/AFK068/bot/pkg/client/github"
+	"github.com/AFK068/bot/pkg/client/stackoverflow"
+
+	botapi "github.com/AFK068/bot/internal/api/openapi/bot/v1"
+	repoMock "github.com/AFK068/bot/internal/domain/mocks"
+	botMock "github.com/AFK068/bot/internal/infrastructure/clients/bot/mocks"
+	githubMock "github.com/AFK068/bot/pkg/client/github/mocks"
+	stackoverflowMock "github.com/AFK068/bot/pkg/client/stackoverflow/mocks"
 )
 
 func TestScrapper_GitHubLinkUpdate(t *testing.T) {

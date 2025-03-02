@@ -7,14 +7,16 @@ import (
 	"sync"
 	"time"
 
-	botapi "github.com/AFK068/bot/internal/api/openapi/bot/v1"
+	"github.com/go-co-op/gocron/v2"
+
 	"github.com/AFK068/bot/internal/domain"
 	"github.com/AFK068/bot/internal/infrastructure/clients/bot"
 	"github.com/AFK068/bot/internal/infrastructure/logger"
 	"github.com/AFK068/bot/pkg/client/github"
 	"github.com/AFK068/bot/pkg/client/stackoverflow"
 	"github.com/AFK068/bot/pkg/utils"
-	"github.com/go-co-op/gocron/v2"
+
+	botapi "github.com/AFK068/bot/internal/api/openapi/bot/v1"
 )
 
 const (

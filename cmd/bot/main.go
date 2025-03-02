@@ -1,13 +1,15 @@
 package main
 
 import (
+	"go.uber.org/fx"
+
 	"github.com/AFK068/bot/config"
 	"github.com/AFK068/bot/internal/application/bot"
 	"github.com/AFK068/bot/internal/infrastructure/clients/scrapper"
-	handler "github.com/AFK068/bot/internal/infrastructure/handler/bot"
 	"github.com/AFK068/bot/internal/infrastructure/logger"
 	"github.com/AFK068/bot/internal/infrastructure/server"
-	"go.uber.org/fx"
+
+	handler "github.com/AFK068/bot/internal/infrastructure/handler/bot"
 )
 
 const (

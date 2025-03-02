@@ -3,9 +3,10 @@ package handler
 import (
 	"net/http"
 
-	botapi "github.com/AFK068/bot/internal/api/openapi/bot/v1"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/labstack/echo/v4"
+
+	botapi "github.com/AFK068/bot/internal/api/openapi/bot/v1"
 )
 
 const (

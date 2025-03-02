@@ -7,13 +7,15 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	botapi "github.com/AFK068/bot/internal/api/openapi/bot/v1"
-	botmocks "github.com/AFK068/bot/internal/application/bot/mocks"
-	handler "github.com/AFK068/bot/internal/infrastructure/handler/bot"
-	"github.com/AFK068/bot/internal/infrastructure/logger"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/AFK068/bot/internal/infrastructure/logger"
+
+	botapi "github.com/AFK068/bot/internal/api/openapi/bot/v1"
+	botmocks "github.com/AFK068/bot/internal/application/bot/mocks"
+	handler "github.com/AFK068/bot/internal/infrastructure/handler/bot"
 )
 
 func TestPostUpdates_Success(t *testing.T) {

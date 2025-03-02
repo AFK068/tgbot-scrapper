@@ -4,13 +4,15 @@ import (
 	"testing"
 	"time"
 
-	api "github.com/AFK068/bot/internal/api/openapi/scrapper/v1"
-	"github.com/AFK068/bot/internal/application/mapper"
-	"github.com/AFK068/bot/internal/domain"
-	"github.com/AFK068/bot/internal/domain/apperrors"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/AFK068/bot/internal/application/mapper"
+	"github.com/AFK068/bot/internal/domain"
+	"github.com/AFK068/bot/internal/domain/apperrors"
+
+	api "github.com/AFK068/bot/internal/api/openapi/scrapper/v1"
 )
 
 func TestMapAddLinkRequestToDomain_Success(t *testing.T) {

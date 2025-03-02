@@ -1,11 +1,13 @@
 package server
 
 import (
-	"github.com/AFK068/bot/config"
-	botapi "github.com/AFK068/bot/internal/api/openapi/bot/v1"
-	"github.com/AFK068/bot/internal/application/bot"
-	handler "github.com/AFK068/bot/internal/infrastructure/handler/bot"
 	"github.com/labstack/echo/v4"
+
+	"github.com/AFK068/bot/config"
+	"github.com/AFK068/bot/internal/application/bot"
+
+	botapi "github.com/AFK068/bot/internal/api/openapi/bot/v1"
+	handler "github.com/AFK068/bot/internal/infrastructure/handler/bot"
 )
 
 type BotServer struct {

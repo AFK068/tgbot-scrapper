@@ -3,10 +3,12 @@ package handler
 import (
 	"fmt"
 
-	botapi "github.com/AFK068/bot/internal/api/openapi/bot/v1"
+	"github.com/labstack/echo/v4"
+
 	"github.com/AFK068/bot/internal/application/bot"
 	"github.com/AFK068/bot/internal/infrastructure/logger"
-	"github.com/labstack/echo/v4"
+
+	botapi "github.com/AFK068/bot/internal/api/openapi/bot/v1"
 )
 
 type BotHandler struct {

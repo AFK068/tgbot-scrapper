@@ -3,15 +3,16 @@ package handler
 import (
 	"errors"
 
-	api "github.com/AFK068/bot/internal/api/openapi/scrapper/v1"
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/labstack/echo/v4"
+
 	"github.com/AFK068/bot/internal/application/mapper"
 	"github.com/AFK068/bot/internal/domain"
 	"github.com/AFK068/bot/internal/domain/apperrors"
 	"github.com/AFK068/bot/internal/infrastructure/logger"
-
 	"github.com/AFK068/bot/pkg/utils"
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/labstack/echo/v4"
+
+	api "github.com/AFK068/bot/internal/api/openapi/scrapper/v1"
 )
 
 type ScrapperHandler struct {

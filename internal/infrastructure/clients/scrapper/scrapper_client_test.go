@@ -7,11 +7,13 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	api "github.com/AFK068/bot/internal/api/openapi/scrapper/v1"
-	"github.com/AFK068/bot/internal/infrastructure/clients/scrapper"
-	"github.com/AFK068/bot/internal/infrastructure/logger"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/AFK068/bot/internal/infrastructure/clients/scrapper"
+	"github.com/AFK068/bot/internal/infrastructure/logger"
+
+	api "github.com/AFK068/bot/internal/api/openapi/scrapper/v1"
 )
 
 func TestPostTgChatID(t *testing.T) {

@@ -1,15 +1,16 @@
 package server
 
 import (
+	"github.com/labstack/echo/v4"
+
 	"github.com/AFK068/bot/config"
-	api "github.com/AFK068/bot/internal/api/openapi/scrapper/v1"
 	"github.com/AFK068/bot/internal/application/scrapper"
 	"github.com/AFK068/bot/internal/domain"
-	handler "github.com/AFK068/bot/internal/infrastructure/handler/scrapper"
 	"github.com/AFK068/bot/internal/infrastructure/logger"
 	"github.com/AFK068/bot/internal/middleware"
 
-	"github.com/labstack/echo/v4"
+	api "github.com/AFK068/bot/internal/api/openapi/scrapper/v1"
+	handler "github.com/AFK068/bot/internal/infrastructure/handler/scrapper"
 )
 
 type ScrapperServer struct {

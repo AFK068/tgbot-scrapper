@@ -5,11 +5,13 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/AFK068/bot/internal/infrastructure/logger"
-	"github.com/AFK068/bot/internal/middleware"
-	checker "github.com/AFK068/bot/internal/middleware/mocks"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/AFK068/bot/internal/infrastructure/logger"
+	"github.com/AFK068/bot/internal/middleware"
+
+	checker "github.com/AFK068/bot/internal/middleware/mocks"
 )
 
 func TestAuthLinkMiddleware_Success(t *testing.T) {
