@@ -62,6 +62,7 @@ func (c *Client) PostUpdates(ctx context.Context, update api.LinkUpdate) error {
 		}
 
 		c.Logger.Error("Bad request: ", "description", *apiErr.Description)
+
 		return fmt.Errorf("bad request: %s", *apiErr.Description)
 	default:
 		c.Logger.Error("Unexpected status code: ", "status_code", resp.StatusCode())
