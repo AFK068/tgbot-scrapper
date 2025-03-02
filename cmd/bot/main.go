@@ -32,7 +32,10 @@ func main() {
 			},
 
 			// Provide bot.
-			bot.NewBot,
+			fx.Annotate(
+				bot.NewBot,
+				fx.As(new(bot.Service)),
+			),
 
 			// Provide bot handler.
 			handler.NewBotHandler,
@@ -42,7 +45,7 @@ func main() {
 		),
 		fx.Invoke(
 			// Run bot.
-			func(b *bot.Bot) error {
+			func(b bot.Service) error {
 				return b.Run()
 			},
 

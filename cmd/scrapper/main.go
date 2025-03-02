@@ -13,12 +13,16 @@ import (
 	"go.uber.org/fx"
 )
 
+const (
+	ConfigPath = "."
+)
+
 func main() {
 	fx.New(
 		fx.Provide(
 			// Provide scrapper config.
 			func() (*config.ScrapperConfig, error) {
-				cfg, err := config.NewScrapperServerConfig(".")
+				cfg, err := config.NewScrapperServerConfig(ConfigPath)
 				if err != nil {
 					return nil, err
 				}
@@ -36,13 +40,19 @@ func main() {
 			handler.NewScrapperHandler,
 
 			// Provide stackoverflow client.
-			stackoverflow.NewClient,
+			fx.Annotate(
+				stackoverflow.NewClient,
+				fx.As(new(stackoverflow.QuestionFetcher)),
+			),
 
 			// Provide github client.
-			github.NewClient,
+			fx.Annotate(
+				github.NewClient,
+				fx.As(new(github.RepoFetcher)),
+			),
 
 			// Provide bot client.
-			func(cfg *config.ScrapperConfig) *bot.Client {
+			func(cfg *config.ScrapperConfig) bot.Service {
 				return bot.NewClient(cfg.BotURL)
 			},
 
