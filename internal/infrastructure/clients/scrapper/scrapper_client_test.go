@@ -9,6 +9,7 @@ import (
 
 	api "github.com/AFK068/bot/internal/api/openapi/scrapper/v1"
 	"github.com/AFK068/bot/internal/infrastructure/clients/scrapper"
+	"github.com/AFK068/bot/internal/infrastructure/logger"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/stretchr/testify/assert"
 )
@@ -27,7 +28,7 @@ func TestPostTgChatID(t *testing.T) {
 
 	defer server.Close()
 
-	client := scrapper.NewClient(server.URL)
+	client := scrapper.NewClient(server.URL, logger.NewDiscardLogger())
 	err := client.PostTgChatID(context.Background(), 123)
 	assert.NoError(t, err)
 }
@@ -46,7 +47,7 @@ func TestDeleteTgChatID(t *testing.T) {
 
 	defer server.Close()
 
-	client := scrapper.NewClient(server.URL)
+	client := scrapper.NewClient(server.URL, logger.NewDiscardLogger())
 	err := client.DeleteTgChatID(context.Background(), 123)
 	assert.NoError(t, err)
 }
@@ -79,7 +80,7 @@ func TestPostLinks(t *testing.T) {
 
 	defer server.Close()
 
-	client := scrapper.NewClient(server.URL)
+	client := scrapper.NewClient(server.URL, logger.NewDiscardLogger())
 	err := client.PostLinks(context.Background(), 123, reqBody)
 	assert.NoError(t, err)
 }
@@ -110,7 +111,7 @@ func TestDeleteLinks(t *testing.T) {
 
 	defer server.Close()
 
-	client := scrapper.NewClient(server.URL)
+	client := scrapper.NewClient(server.URL, logger.NewDiscardLogger())
 	err := client.DeleteLinks(context.Background(), 123, reqBody)
 	assert.NoError(t, err)
 }
@@ -147,7 +148,7 @@ func TestGetLinks(t *testing.T) {
 
 	defer server.Close()
 
-	client := scrapper.NewClient(server.URL)
+	client := scrapper.NewClient(server.URL, logger.NewDiscardLogger())
 	resp, err := client.GetLinks(context.Background(), 123)
 	assert.NoError(t, err)
 	assert.Equal(t, response, resp)

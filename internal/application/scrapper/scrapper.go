@@ -10,6 +10,7 @@ import (
 	botapi "github.com/AFK068/bot/internal/api/openapi/bot/v1"
 	"github.com/AFK068/bot/internal/domain"
 	"github.com/AFK068/bot/internal/infrastructure/clients/bot"
+	"github.com/AFK068/bot/internal/infrastructure/logger"
 	"github.com/AFK068/bot/pkg/client/github"
 	"github.com/AFK068/bot/pkg/client/stackoverflow"
 	"github.com/AFK068/bot/pkg/utils"
@@ -26,6 +27,7 @@ type Scrapper struct {
 	stackOverflowClient stackoverflow.QuestionFetcher
 	gitHubClient        github.RepoFetcher
 	botClient           bot.Service
+	logger              *logger.Logger
 }
 
 func NewScrapperScheduler(
@@ -33,6 +35,7 @@ func NewScrapperScheduler(
 	stackoverflowClient stackoverflow.QuestionFetcher,
 	githubClient github.RepoFetcher,
 	botClient bot.Service,
+	log *logger.Logger,
 ) (*Scrapper, error) {
 	scheduler, err := gocron.NewScheduler()
 	if err != nil {
@@ -45,10 +48,12 @@ func NewScrapperScheduler(
 		stackOverflowClient: stackoverflowClient,
 		gitHubClient:        githubClient,
 		botClient:           botClient,
+		logger:              log,
 	}, nil
 }
 
 func (s *Scrapper) Run(jobDuration time.Duration) {
+	s.logger.Info("Starting scrapper", "jobDuration", jobDuration.String())
 	_, err := s.scheduler.NewJob(
 		gocron.DurationJob(
 			jobDuration,
@@ -59,19 +64,23 @@ func (s *Scrapper) Run(jobDuration time.Duration) {
 	)
 
 	if err != nil {
+		s.logger.Error("Failed to create new job", "error", err)
 		return
 	}
 
 	s.scheduler.Start()
+	s.logger.Info("Scrapper started")
 }
 
 func (s *Scrapper) notifyBot(ctx context.Context, link *domain.Link) error {
+	s.logger.Info("Notifying bot for link", "url", link.URL)
 	update := botapi.LinkUpdate{
 		Url:       &link.URL,
 		TgChatIds: utils.SliceInt64Ptr(s.repository.GetChatIDsByLink(link)),
 	}
 
 	if err := s.botClient.PostUpdates(ctx, update); err != nil {
+		s.logger.Error("Failed to post updates", "error", err)
 		return fmt.Errorf("failed to post updates: %w", err)
 	}
 
@@ -79,10 +88,13 @@ func (s *Scrapper) notifyBot(ctx context.Context, link *domain.Link) error {
 }
 
 func (s *Scrapper) checkLinkForUpdate(ctx context.Context, link *domain.Link) (bool, error) {
+	s.logger.Info("Checking link for update", "url", link.URL)
+
 	switch link.Type {
 	case domain.StackoverflowType:
 		question, err := s.stackOverflowClient.GetQuestion(ctx, link.URL)
 		if err != nil {
+			s.logger.Error("Failed to get question", "error", err)
 			return false, fmt.Errorf("failed to get question: %w", err)
 		}
 
@@ -90,16 +102,20 @@ func (s *Scrapper) checkLinkForUpdate(ctx context.Context, link *domain.Link) (b
 	case domain.GithubType:
 		repo, err := s.gitHubClient.GetRepo(ctx, link.URL)
 		if err != nil {
+			s.logger.Error("Failed to get repo", "error", err)
 			return false, fmt.Errorf("failed to get repo: %w", err)
 		}
 
 		return repo.UpdatedAt.After(link.LastCheck), nil
 	default:
+		s.logger.Error("Unknown link type", "type", link.Type)
 		return false, fmt.Errorf("unknown link type: %s", link.Type)
 	}
 }
 
 func (s *Scrapper) scrappeLinksTask() {
+	s.logger.Info("Starting scrappeLinksTask")
+
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -118,36 +134,45 @@ func (s *Scrapper) scrappeLinksTask() {
 			case sema <- struct{}{}:
 				defer func() { <-sema }()
 			case <-ctx.Done():
+				s.logger.Warn("Context done before processing link", "url", l.URL)
 				return
 			}
 
 			if ctx.Err() != nil {
+				s.logger.Warn("Context error", "error", ctx.Err())
 				return
 			}
 
 			// Check if the link needs to be updated.
 			needUpdate, err := s.checkLinkForUpdate(ctx, l)
 			if err != nil {
+				s.logger.Error("Error checking link for update", "error", err)
 				return
 			}
 
 			// Skip if the link does not need to be updated.
 			if !needUpdate {
+				s.logger.Info("No update needed for link", "url", l.URL)
 				return
 			}
 
 			// Notify the bot about the update.
 			if err := s.notifyBot(ctx, l); err != nil {
+				s.logger.Error("Error notifying bot: ", "error", err)
 				return
 			}
 
 			// Update the last check time.
 			err = s.repository.UpdateLastCheck(l)
 			if err != nil {
+				s.logger.Error("Error updating last check", "error", err)
 				return
 			}
+
+			s.logger.Info("Successfully processed link", "url", l.URL)
 		}(link)
 	}
 
 	wg.Wait()
+	s.logger.Info("Finished scrappeLinksTask")
 }

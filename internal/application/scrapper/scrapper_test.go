@@ -9,6 +9,7 @@ import (
 	"github.com/AFK068/bot/internal/domain"
 	repoMock "github.com/AFK068/bot/internal/domain/mocks"
 	botMock "github.com/AFK068/bot/internal/infrastructure/clients/bot/mocks"
+	"github.com/AFK068/bot/internal/infrastructure/logger"
 	"github.com/AFK068/bot/pkg/client/github"
 	githubMock "github.com/AFK068/bot/pkg/client/github/mocks"
 	"github.com/AFK068/bot/pkg/client/stackoverflow"
@@ -41,7 +42,7 @@ func TestScrapper_GitHubLinkUpdate(t *testing.T) {
 		return *update.Url == testLink.URL && (*update.TgChatIds)[0] == 123
 	})).Return(nil)
 
-	s, err := scrapper.NewScrapperScheduler(repo, stackoverflowClient, githubClient, botClient)
+	s, err := scrapper.NewScrapperScheduler(repo, stackoverflowClient, githubClient, botClient, logger.NewDiscardLogger())
 	assert.NoError(t, err)
 
 	s.Run(time.Second)
@@ -76,7 +77,7 @@ func TestScrapper_StackOverflowLinkUpdate(t *testing.T) {
 		return *update.Url == testLink.URL && (*update.TgChatIds)[0] == 123
 	})).Return(nil)
 
-	s, err := scrapper.NewScrapperScheduler(repo, stackoverflowClient, githubClient, botClient)
+	s, err := scrapper.NewScrapperScheduler(repo, stackoverflowClient, githubClient, botClient, logger.NewDiscardLogger())
 	assert.NoError(t, err)
 
 	s.Run(time.Second)

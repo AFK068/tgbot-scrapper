@@ -9,6 +9,7 @@ import (
 
 	api "github.com/AFK068/bot/internal/api/openapi/bot/v1"
 	"github.com/AFK068/bot/internal/infrastructure/clients/bot"
+	"github.com/AFK068/bot/internal/infrastructure/logger"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/stretchr/testify/assert"
 )
@@ -40,7 +41,7 @@ func TestPostUpdates(t *testing.T) {
 
 	defer server.Close()
 
-	client := bot.NewClient(server.URL)
+	client := bot.NewClient(server.URL, logger.NewDiscardLogger())
 	err := client.PostUpdates(context.Background(), reqBody)
 	assert.NoError(t, err)
 }

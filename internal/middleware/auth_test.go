@@ -5,6 +5,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/AFK068/bot/internal/infrastructure/logger"
 	"github.com/AFK068/bot/internal/middleware"
 	checker "github.com/AFK068/bot/internal/middleware/mocks"
 	"github.com/labstack/echo/v4"
@@ -13,7 +14,7 @@ import (
 
 func TestAuthLinkMiddleware_Success(t *testing.T) {
 	checkerMock := checker.NewUserChecker(t)
-	mw := middleware.AuthLinkMiddleware(checkerMock)
+	mw := middleware.AuthLinkMiddleware(checkerMock, logger.NewDiscardLogger())
 
 	req := httptest.NewRequest(http.MethodGet, "/links", http.NoBody)
 	rec := httptest.NewRecorder()
@@ -42,7 +43,7 @@ func TestAuthLinkMiddleware_Success(t *testing.T) {
 
 func TestAuthLinkMiddleware_SkipNonLinksPath(t *testing.T) {
 	checkerMock := checker.NewUserChecker(t)
-	mw := middleware.AuthLinkMiddleware(checkerMock)
+	mw := middleware.AuthLinkMiddleware(checkerMock, logger.NewDiscardLogger())
 
 	req := httptest.NewRequest(http.MethodGet, "/other", http.NoBody)
 	rec := httptest.NewRecorder()
@@ -65,7 +66,7 @@ func TestAuthLinkMiddleware_SkipNonLinksPath(t *testing.T) {
 
 func TestAuthLinkMiddleware_MissingHeader(t *testing.T) {
 	checkerMock := checker.NewUserChecker(t)
-	mw := middleware.AuthLinkMiddleware(checkerMock)
+	mw := middleware.AuthLinkMiddleware(checkerMock, logger.NewDiscardLogger())
 
 	req := httptest.NewRequest(http.MethodGet, "/links", http.NoBody)
 	rec := httptest.NewRecorder()
@@ -83,7 +84,7 @@ func TestAuthLinkMiddleware_MissingHeader(t *testing.T) {
 
 func TestAuthLinkMiddleware_InvalidHeader(t *testing.T) {
 	checkerMock := checker.NewUserChecker(t)
-	mw := middleware.AuthLinkMiddleware(checkerMock)
+	mw := middleware.AuthLinkMiddleware(checkerMock, logger.NewDiscardLogger())
 
 	req := httptest.NewRequest(http.MethodGet, "/links", http.NoBody)
 	rec := httptest.NewRecorder()
@@ -103,7 +104,7 @@ func TestAuthLinkMiddleware_InvalidHeader(t *testing.T) {
 
 func TestAuthLinkMiddleware_UserNotExist(t *testing.T) {
 	checkerMock := checker.NewUserChecker(t)
-	mw := middleware.AuthLinkMiddleware(checkerMock)
+	mw := middleware.AuthLinkMiddleware(checkerMock, logger.NewDiscardLogger())
 
 	req := httptest.NewRequest(http.MethodGet, "/links", http.NoBody)
 	rec := httptest.NewRecorder()

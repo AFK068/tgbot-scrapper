@@ -12,6 +12,7 @@ import (
 	"github.com/AFK068/bot/internal/domain/apperrors"
 	repomock "github.com/AFK068/bot/internal/domain/mocks"
 	handler "github.com/AFK068/bot/internal/infrastructure/handler/scrapper"
+	"github.com/AFK068/bot/internal/infrastructure/logger"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
@@ -20,7 +21,7 @@ import (
 
 func TestPostTgChatId_Success(t *testing.T) {
 	repoMock := repomock.NewChatLinkRepository(t)
-	h := handler.NewScrapperHandler(repoMock)
+	h := handler.NewScrapperHandler(repoMock, logger.NewDiscardLogger())
 
 	repoMock.On("CheckUserExistence", int64(123)).Return(false)
 	repoMock.On("RegisterChat", int64(123)).Return(nil)
@@ -40,7 +41,7 @@ func TestPostTgChatId_Success(t *testing.T) {
 
 func TestPostTgChatId_AlreadyExists(t *testing.T) {
 	repoMock := repomock.NewChatLinkRepository(t)
-	h := handler.NewScrapperHandler(repoMock)
+	h := handler.NewScrapperHandler(repoMock, logger.NewDiscardLogger())
 
 	repoMock.On("CheckUserExistence", int64(123)).Return(true)
 
@@ -59,7 +60,7 @@ func TestPostTgChatId_AlreadyExists(t *testing.T) {
 
 func TestPostTgChatId_Failure(t *testing.T) {
 	repoMock := repomock.NewChatLinkRepository(t)
-	h := handler.NewScrapperHandler(repoMock)
+	h := handler.NewScrapperHandler(repoMock, logger.NewDiscardLogger())
 
 	repoMock.On("CheckUserExistence", int64(123)).Return(false)
 	repoMock.On("RegisterChat", int64(123)).Return(assert.AnError)
@@ -79,7 +80,7 @@ func TestPostTgChatId_Failure(t *testing.T) {
 
 func TestDeleteTgChatId_Success(t *testing.T) {
 	repoMock := repomock.NewChatLinkRepository(t)
-	h := handler.NewScrapperHandler(repoMock)
+	h := handler.NewScrapperHandler(repoMock, logger.NewDiscardLogger())
 
 	repoMock.On("CheckUserExistence", int64(123)).Return(true)
 	repoMock.On("DeleteChat", int64(123)).Return(nil)
@@ -99,7 +100,7 @@ func TestDeleteTgChatId_Success(t *testing.T) {
 
 func TestDeleteTgChatId_UserNotFound(t *testing.T) {
 	repoMock := repomock.NewChatLinkRepository(t)
-	h := handler.NewScrapperHandler(repoMock)
+	h := handler.NewScrapperHandler(repoMock, logger.NewDiscardLogger())
 
 	repoMock.On("CheckUserExistence", int64(123)).Return(false)
 
@@ -118,7 +119,7 @@ func TestDeleteTgChatId_UserNotFound(t *testing.T) {
 
 func TestDeleteTgChatId_Failure(t *testing.T) {
 	repoMock := repomock.NewChatLinkRepository(t)
-	h := handler.NewScrapperHandler(repoMock)
+	h := handler.NewScrapperHandler(repoMock, logger.NewDiscardLogger())
 
 	repoMock.On("CheckUserExistence", int64(123)).Return(true)
 	repoMock.On("DeleteChat", int64(123)).Return(assert.AnError)
@@ -138,7 +139,7 @@ func TestDeleteTgChatId_Failure(t *testing.T) {
 
 func TestPostLinks_Success(t *testing.T) {
 	repoMock := repomock.NewChatLinkRepository(t)
-	h := handler.NewScrapperHandler(repoMock)
+	h := handler.NewScrapperHandler(repoMock, logger.NewDiscardLogger())
 
 	body := scrapperapi.AddLinkRequest{
 		Link:    aws.String("https://github.com"),
@@ -166,7 +167,7 @@ func TestPostLinks_Success(t *testing.T) {
 
 func TestPostLinks_InvalidLink(t *testing.T) {
 	repoMock := repomock.NewChatLinkRepository(t)
-	h := handler.NewScrapperHandler(repoMock)
+	h := handler.NewScrapperHandler(repoMock, logger.NewDiscardLogger())
 
 	body := scrapperapi.AddLinkRequest{
 		Link:    aws.String("test"),
@@ -192,7 +193,7 @@ func TestPostLinks_InvalidLink(t *testing.T) {
 
 func TestPostLinks_Failure(t *testing.T) {
 	repoMock := repomock.NewChatLinkRepository(t)
-	h := handler.NewScrapperHandler(repoMock)
+	h := handler.NewScrapperHandler(repoMock, logger.NewDiscardLogger())
 
 	body := scrapperapi.AddLinkRequest{
 		Link:    aws.String("https://github.com"),
@@ -220,7 +221,7 @@ func TestPostLinks_Failure(t *testing.T) {
 
 func TestPostLinks_DuplicateLink(t *testing.T) {
 	repoMock := repomock.NewChatLinkRepository(t)
-	h := handler.NewScrapperHandler(repoMock)
+	h := handler.NewScrapperHandler(repoMock, logger.NewDiscardLogger())
 
 	body := scrapperapi.AddLinkRequest{
 		Link: aws.String("https://github.com"),
@@ -259,7 +260,7 @@ func TestPostLinks_DuplicateLink(t *testing.T) {
 
 func TestDeleteLinks_Success(t *testing.T) {
 	repoMock := repomock.NewChatLinkRepository(t)
-	h := handler.NewScrapperHandler(repoMock)
+	h := handler.NewScrapperHandler(repoMock, logger.NewDiscardLogger())
 
 	body := scrapperapi.RemoveLinkRequest{
 		Link: aws.String("https://github.com"),
@@ -285,7 +286,7 @@ func TestDeleteLinks_Success(t *testing.T) {
 
 func TestDeleteLinks_InvalidLink(t *testing.T) {
 	repoMock := repomock.NewChatLinkRepository(t)
-	h := handler.NewScrapperHandler(repoMock)
+	h := handler.NewScrapperHandler(repoMock, logger.NewDiscardLogger())
 
 	body := scrapperapi.RemoveLinkRequest{
 		Link: aws.String(""),
@@ -309,7 +310,7 @@ func TestDeleteLinks_InvalidLink(t *testing.T) {
 
 func TestDeleteLinks_LinkNotExist(t *testing.T) {
 	repoMock := repomock.NewChatLinkRepository(t)
-	h := handler.NewScrapperHandler(repoMock)
+	h := handler.NewScrapperHandler(repoMock, logger.NewDiscardLogger())
 
 	body := scrapperapi.RemoveLinkRequest{
 		Link: aws.String("test"),
@@ -335,7 +336,7 @@ func TestDeleteLinks_LinkNotExist(t *testing.T) {
 
 func TestDeleteLinks_Failure(t *testing.T) {
 	repoMock := repomock.NewChatLinkRepository(t)
-	h := handler.NewScrapperHandler(repoMock)
+	h := handler.NewScrapperHandler(repoMock, logger.NewDiscardLogger())
 
 	body := scrapperapi.RemoveLinkRequest{
 		Link: aws.String("https://github.com"),
@@ -361,7 +362,7 @@ func TestDeleteLinks_Failure(t *testing.T) {
 
 func TestGetLinks_Success(t *testing.T) {
 	repoMock := repomock.NewChatLinkRepository(t)
-	h := handler.NewScrapperHandler(repoMock)
+	h := handler.NewScrapperHandler(repoMock, logger.NewDiscardLogger())
 
 	expectedLinks := []*domain.Link{
 		{URL: "https://test", Tags: []string{"test_tag"}},
@@ -392,7 +393,7 @@ func TestGetLinks_Success(t *testing.T) {
 
 func TestGetLinks_EmptyList(t *testing.T) {
 	repoMock := repomock.NewChatLinkRepository(t)
-	h := handler.NewScrapperHandler(repoMock)
+	h := handler.NewScrapperHandler(repoMock, logger.NewDiscardLogger())
 
 	repoMock.On("GetListLinks", int64(123)).Return([]*domain.Link{}, nil)
 
@@ -417,7 +418,7 @@ func TestGetLinks_EmptyList(t *testing.T) {
 
 func TestGetLinks_Failure(t *testing.T) {
 	repoMock := repomock.NewChatLinkRepository(t)
-	h := handler.NewScrapperHandler(repoMock)
+	h := handler.NewScrapperHandler(repoMock, logger.NewDiscardLogger())
 
 	repoMock.On("GetListLinks", int64(123)).Return(nil, assert.AnError)
 

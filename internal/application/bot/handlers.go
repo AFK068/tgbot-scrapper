@@ -56,6 +56,8 @@ func (b *Bot) handleCommand(msg *tgbotapi.Message) {
 	chatID := msg.Chat.ID
 	command := msg.Command()
 
+	b.Logger.Info("Received command", "chatID", chatID, "command", command)
+
 	switch command {
 	case StartCommand:
 		b.handleStart(chatID)
@@ -76,6 +78,8 @@ func (b *Bot) handleMessage(msg *tgbotapi.Message) {
 	chatID := msg.Chat.ID
 	text := msg.Text
 
+	b.Logger.Info("Received message", "chatID", chatID, "text", text)
+
 	conv := b.StateManager.GetConversation(chatID)
 	if conv.FSM.Current() == StateIdle {
 		b.SendMessage(chatID, "Please enter a command to start. Use /help to see the list of available commands.")
@@ -88,7 +92,9 @@ func (b *Bot) handleMessage(msg *tgbotapi.Message) {
 			conv.URL = text
 
 			if err := conv.FSM.Event(context.Background(), "set_url"); err != nil {
+				b.Logger.Error("Error setting URL", "error", err)
 				b.SendMessage(chatID, "Error setting URL. Please try again later.")
+
 				return
 			}
 
@@ -103,7 +109,9 @@ func (b *Bot) handleMessage(msg *tgbotapi.Message) {
 		}
 
 		if err := conv.FSM.Event(context.Background(), "set_tags"); err != nil {
+			b.Logger.Error("Error setting tags", "error", err)
 			b.SendMessage(chatID, "Error setting tags. Please try again later.")
+
 			return
 		}
 
@@ -121,12 +129,14 @@ func (b *Bot) handleMessage(msg *tgbotapi.Message) {
 		})
 
 		if err != nil {
+			b.Logger.Error("Error posting links", "error", err)
 			b.handleError(chatID, err)
 		} else {
 			b.SendMessage(chatID, "Link successfully added!", mainKeyboard)
 		}
 
 		if err := conv.FSM.Event(context.Background(), "complete"); err != nil {
+			b.Logger.Error("Error completing tracking", "error", err)
 			b.SendMessage(chatID, "Error completing tracking. Please try again later.", mainKeyboard)
 		}
 
@@ -138,7 +148,9 @@ func (b *Bot) startTrackConversation(chatID int64) {
 	conv := b.StateManager.GetConversation(chatID)
 
 	if err := conv.FSM.Event(context.Background(), "start_track"); err != nil {
+		b.Logger.Error("Error starting tracking", "error", err)
 		b.SendMessage(chatID, "Error starting tracking. Please try again later.")
+
 		return
 	}
 
@@ -154,6 +166,7 @@ func (b *Bot) handleUntrack(chatID int64, link string) {
 	if err := b.ScrapperClient.DeleteLinks(context.Background(), chatID, api.RemoveLinkRequest{
 		Link: aws.String(link),
 	}); err != nil {
+		b.Logger.Error("Error deleting link", "error", err)
 		b.handleError(chatID, err)
 	} else {
 		b.SendMessage(chatID, "Link successfully removed from tracking!", mainKeyboard)
@@ -163,7 +176,9 @@ func (b *Bot) handleUntrack(chatID int64, link string) {
 func (b *Bot) handleList(chatID int64) {
 	links, err := b.ScrapperClient.GetLinks(context.Background(), chatID)
 	if err != nil {
+		b.Logger.Error("Error getting links", "error", err)
 		b.handleError(chatID, err)
+
 		return
 	}
 
@@ -185,7 +200,9 @@ func (b *Bot) handleList(chatID int64) {
 
 func (b *Bot) handleStart(chatID int64) {
 	if err := b.ScrapperClient.PostTgChatID(context.Background(), chatID); err != nil {
+		b.Logger.Error("Error posting chat ID", "error", err)
 		b.handleError(chatID, err)
+
 		return
 	}
 
@@ -214,15 +231,20 @@ func (b *Bot) handleError(chatID int64, err error) {
 	if errors.As(err, &errResp) {
 		switch errResp.Code {
 		case http.StatusBadRequest:
+			b.Logger.Error("Bad request error", "error", errResp.Message)
 			b.SendMessage(chatID, fmt.Sprintf("❌ Request error: %s", errResp.Message))
 		case http.StatusNotFound:
+			b.Logger.Error("Not found error", "error", errResp.Message)
 			b.SendMessage(chatID, fmt.Sprintf("🔍 Not found: %s", errResp.Message))
 		case http.StatusUnauthorized:
+			b.Logger.Error("Unauthorized access error", "error", errResp.Message)
 			b.SendMessage(chatID, fmt.Sprintf("❌ Unauthorized access: %s", errResp.Message))
 		default:
+			b.Logger.Error("Unexpected error", "error", errResp.Message)
 			b.SendMessage(chatID, "⚠️ An internal error occurred")
 		}
 	} else {
+		b.Logger.Error("Internal error", "error", err)
 		b.SendMessage(chatID, "⚠️ An internal error occurred")
 	}
 }

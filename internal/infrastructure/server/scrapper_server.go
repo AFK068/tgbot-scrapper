@@ -6,6 +6,7 @@ import (
 	"github.com/AFK068/bot/internal/application/scrapper"
 	"github.com/AFK068/bot/internal/domain"
 	handler "github.com/AFK068/bot/internal/infrastructure/handler/scrapper"
+	"github.com/AFK068/bot/internal/infrastructure/logger"
 	"github.com/AFK068/bot/internal/middleware"
 
 	"github.com/labstack/echo/v4"
@@ -17,6 +18,7 @@ type ScrapperServer struct {
 	Scheduler *scrapper.Scrapper
 	Echo      *echo.Echo
 	Repo      domain.ChatLinkRepository
+	Logger    *logger.Logger
 }
 
 func NewScrapperServer(
@@ -24,6 +26,7 @@ func NewScrapperServer(
 	repo domain.ChatLinkRepository,
 	hd *handler.ScrapperHandler,
 	sd *scrapper.Scrapper,
+	log *logger.Logger,
 ) *ScrapperServer {
 	return &ScrapperServer{
 		Echo:      echo.New(),
@@ -31,6 +34,7 @@ func NewScrapperServer(
 		Repo:      repo,
 		Handler:   hd,
 		Scheduler: sd,
+		Logger:    log,
 	}
 }
 
@@ -38,7 +42,7 @@ func (s *ScrapperServer) Start() error {
 	api.RegisterHandlers(s.Echo, s.Handler)
 
 	// Middleware for checking the user authentication.
-	s.Echo.Use(middleware.AuthLinkMiddleware(s.Repo))
+	s.Echo.Use(middleware.AuthLinkMiddleware(s.Repo, s.Logger))
 
 	// Run the scrapper.
 	s.Scheduler.Run(scrapper.DefaultJobDuration)

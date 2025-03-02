@@ -10,6 +10,7 @@ import (
 	botapi "github.com/AFK068/bot/internal/api/openapi/bot/v1"
 	botmocks "github.com/AFK068/bot/internal/application/bot/mocks"
 	handler "github.com/AFK068/bot/internal/infrastructure/handler/bot"
+	"github.com/AFK068/bot/internal/infrastructure/logger"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
@@ -17,7 +18,7 @@ import (
 
 func TestPostUpdates_Success(t *testing.T) {
 	botMock := botmocks.NewService(t)
-	h := handler.NewBotHandler(botMock)
+	h := handler.NewBotHandler(botMock, logger.NewDiscardLogger())
 
 	botMock.On("SendMessage", int64(123), "Link updated: https://test\nDescription: Test description").Once()
 	botMock.On("SendMessage", int64(456), "Link updated: https://test").Once()
@@ -64,7 +65,7 @@ func TestPostUpdates_Success(t *testing.T) {
 
 func TestPostUpdates_InvalidBody(t *testing.T) {
 	botMock := botmocks.NewService(t)
-	h := handler.NewBotHandler(botMock)
+	h := handler.NewBotHandler(botMock, logger.NewDiscardLogger())
 
 	req := httptest.NewRequest(http.MethodPost, "/updates", bytes.NewReader([]byte(`Invalid_body`)))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
@@ -81,7 +82,7 @@ func TestPostUpdates_InvalidBody(t *testing.T) {
 
 func TestPostUpdates_EmptyTgChatIDs(t *testing.T) {
 	botMock := botmocks.NewService(t)
-	h := handler.NewBotHandler(botMock)
+	h := handler.NewBotHandler(botMock, logger.NewDiscardLogger())
 
 	testCases := []struct {
 		name string
@@ -123,7 +124,7 @@ func TestPostUpdates_EmptyTgChatIDs(t *testing.T) {
 
 func TestPostUpdates_EmptyURL(t *testing.T) {
 	botMock := botmocks.NewService(t)
-	h := handler.NewBotHandler(botMock)
+	h := handler.NewBotHandler(botMock, logger.NewDiscardLogger())
 
 	testCases := []struct {
 		name string

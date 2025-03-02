@@ -6,6 +6,7 @@ import (
 	"github.com/AFK068/bot/internal/domain"
 	"github.com/AFK068/bot/internal/infrastructure/clients/bot"
 	handler "github.com/AFK068/bot/internal/infrastructure/handler/scrapper"
+	"github.com/AFK068/bot/internal/infrastructure/logger"
 	"github.com/AFK068/bot/internal/infrastructure/repository"
 	"github.com/AFK068/bot/internal/infrastructure/server"
 	"github.com/AFK068/bot/pkg/client/github"
@@ -20,6 +21,9 @@ const (
 func main() {
 	fx.New(
 		fx.Provide(
+			// Provide logger.
+			logger.NewLogger,
+
 			// Provide scrapper config.
 			func() (*config.ScrapperConfig, error) {
 				cfg, err := config.NewScrapperServerConfig(ConfigPath)
@@ -52,8 +56,8 @@ func main() {
 			),
 
 			// Provide bot client.
-			func(cfg *config.ScrapperConfig) bot.Service {
-				return bot.NewClient(cfg.BotURL)
+			func(cfg *config.ScrapperConfig, log *logger.Logger) bot.Service {
+				return bot.NewClient(cfg.BotURL, log)
 			},
 
 			// Provide scrapper scheduler.

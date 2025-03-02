@@ -5,6 +5,7 @@ import (
 
 	"github.com/AFK068/bot/config"
 	"github.com/AFK068/bot/internal/infrastructure/clients/scrapper"
+	"github.com/AFK068/bot/internal/infrastructure/logger"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
@@ -18,10 +19,12 @@ type Bot struct {
 	Config         *config.BotConfig
 	ScrapperClient *scrapper.Client
 	StateManager   *StateManager
+	Logger         *logger.Logger
 }
 
-func NewBot(cfg *config.BotConfig, sc *scrapper.Client) *Bot {
+func NewBot(log *logger.Logger, cfg *config.BotConfig, sc *scrapper.Client) *Bot {
 	return &Bot{
+		Logger:         log,
 		Config:         cfg,
 		ScrapperClient: sc,
 	}
@@ -29,10 +32,14 @@ func NewBot(cfg *config.BotConfig, sc *scrapper.Client) *Bot {
 
 func (b *Bot) Run() error {
 	if err := b.setBotAPI(); err != nil {
+		b.Logger.Error("Failed to set bot API", "error", err)
+
 		return fmt.Errorf("setting bot api: %w", err)
 	}
 
 	if err := b.setBotCommands(); err != nil {
+		b.Logger.Error("Failed to set bot commands", "error", err)
+
 		return fmt.Errorf("setting bot commands: %w", err)
 	}
 
@@ -40,6 +47,8 @@ func (b *Bot) Run() error {
 
 	updates := b.initUpdatesChannel()
 	go b.processUpdates(updates)
+
+	b.Logger.Info("Bot is running")
 
 	return nil
 }
@@ -62,8 +71,21 @@ func (b *Bot) SendMessage(chatID int64, text string, replyMarkup ...interface{})
 	}
 
 	if _, err := b.API.Send(msg); err != nil {
-		fmt.Printf("Ошибка отправки сообщения: %v\n", err)
+		b.Logger.Error("Sending message",
+			"chatID", chatID,
+			"text", text,
+			"replyMarkup", replyMarkup,
+			"error", err,
+		)
+
+		return
 	}
+
+	b.Logger.Info("Message sent",
+		"chatID", chatID,
+		"text", text,
+		"replyMarkup", replyMarkup,
+	)
 }
 
 func (b *Bot) processUpdates(updates tgbotapi.UpdatesChannel) {
