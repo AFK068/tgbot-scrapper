@@ -14,16 +14,15 @@ import (
 	"github.com/AFK068/bot/pkg/client/stackoverflow"
 
 	botapi "github.com/AFK068/bot/internal/api/openapi/bot/v1"
-	githubMock "github.com/AFK068/bot/internal/application/scrapper/mocks"
-	stackoverflowMock "github.com/AFK068/bot/internal/application/scrapper/mocks"
+	scrapperMock "github.com/AFK068/bot/internal/application/scrapper/mocks"
 	repoMock "github.com/AFK068/bot/internal/domain/mocks"
 	botMock "github.com/AFK068/bot/internal/infrastructure/clients/bot/mocks"
 )
 
 func TestScrapper_GitHubLinkUpdate(t *testing.T) {
 	repo := repoMock.NewChatLinkRepository(t)
-	githubClient := githubMock.NewGitHubRepoFetcher(t)
-	stackoverflowClient := stackoverflowMock.NewStackOverlowQuestionFetcher(t)
+	githubClient := scrapperMock.NewGitHubRepoFetcher(t)
+	stackoverflowClient := scrapperMock.NewStackOverlowQuestionFetcher(t)
 	botClient := botMock.NewService(t)
 
 	testLink := &domain.Link{
@@ -57,8 +56,8 @@ func TestScrapper_GitHubLinkUpdate(t *testing.T) {
 
 func TestScrapper_StackOverflowLinkUpdate(t *testing.T) {
 	repo := repoMock.NewChatLinkRepository(t)
-	githubClient := githubMock.NewGitHubRepoFetcher(t)
-	stackoverflowClient := stackoverflowMock.NewStackOverlowQuestionFetcher(t)
+	githubClient := scrapperMock.NewGitHubRepoFetcher(t)
+	stackoverflowClient := scrapperMock.NewStackOverlowQuestionFetcher(t)
 	botClient := botMock.NewService(t)
 
 	testLink := &domain.Link{
