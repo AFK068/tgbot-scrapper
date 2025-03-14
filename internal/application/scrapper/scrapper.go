@@ -23,19 +23,27 @@ const (
 	DefaultJobDuration = 10 * time.Minute
 )
 
+type StackOverlowQuestionFetcher interface {
+	GetQuestion(ctx context.Context, questionURL string) (*stackoverflow.Question, error)
+}
+
+type GitHubRepoFetcher interface {
+	GetRepo(ctx context.Context, questionURL string) (*github.Repository, error)
+}
+
 type Scrapper struct {
 	scheduler           gocron.Scheduler
 	repository          domain.ChatLinkRepository
-	stackOverflowClient stackoverflow.QuestionFetcher
-	gitHubClient        github.RepoFetcher
+	stackOverflowClient StackOverlowQuestionFetcher
+	gitHubClient        GitHubRepoFetcher
 	botClient           bot.Service
 	logger              *logger.Logger
 }
 
 func NewScrapperScheduler(
 	repository domain.ChatLinkRepository,
-	stackoverflowClient stackoverflow.QuestionFetcher,
-	githubClient github.RepoFetcher,
+	stackoverflowClient StackOverlowQuestionFetcher,
+	githubClient GitHubRepoFetcher,
 	botClient bot.Service,
 	log *logger.Logger,
 ) (*Scrapper, error) {
