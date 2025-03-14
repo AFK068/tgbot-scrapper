@@ -48,13 +48,13 @@ func main() {
 			// Provide stackoverflow client.
 			fx.Annotate(
 				stackoverflow.NewClient,
-				fx.As(new(stackoverflow.QuestionFetcher)),
+				fx.As(new(scrapper.StackOverlowQuestionFetcher)),
 			),
 
 			// Provide github client.
 			fx.Annotate(
 				github.NewClient,
-				fx.As(new(github.RepoFetcher)),
+				fx.As(new(scrapper.GitHubRepoFetcher)),
 			),
 
 			// Provide bot client.
