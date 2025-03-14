@@ -6,6 +6,11 @@ import (
 	"github.com/spf13/viper"
 )
 
+const (
+	ConfigScrapperName = "scrapper"
+	ConfigScrapperType = "env"
+)
+
 type ScrapperConfig struct {
 	Host   string `mapstructure:"SERVER_HOST"`
 	Port   string `mapstructure:"SERVER_PORT"`
@@ -14,8 +19,8 @@ type ScrapperConfig struct {
 
 func NewScrapperServerConfig(file string) (*ScrapperConfig, error) {
 	viper.AddConfigPath(file)
-	viper.SetConfigName("scrapper")
-	viper.SetConfigType("env")
+	viper.SetConfigName(ConfigScrapperName)
+	viper.SetConfigType(ConfigScrapperType)
 
 	viper.AutomaticEnv()
 

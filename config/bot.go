@@ -6,6 +6,11 @@ import (
 	"github.com/spf13/viper"
 )
 
+const (
+	ConfigBotName = "bot"
+	ConfigBotType = "env"
+)
+
 type BotConfig struct {
 	Token       string `mapstructure:"BOT_TOKEN"`
 	Host        string `mapstructure:"SERVER_HOST"`
@@ -15,8 +20,8 @@ type BotConfig struct {
 
 func NewBotConfig(file string) (*BotConfig, error) {
 	viper.AddConfigPath(file)
-	viper.SetConfigName("bot")
-	viper.SetConfigType("env")
+	viper.SetConfigName(ConfigBotName)
+	viper.SetConfigType(ConfigBotType)
 
 	viper.AutomaticEnv()
 
