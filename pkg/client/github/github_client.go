@@ -16,10 +16,6 @@ const (
 	BaseGitHubAPIURL = "https://api.github.com"
 )
 
-type RepoFetcher interface {
-	GetRepo(ctx context.Context, questionURL string) (*Repository, error)
-}
-
 type Client struct {
 	BaseURL string
 	Client  *resty.Client
