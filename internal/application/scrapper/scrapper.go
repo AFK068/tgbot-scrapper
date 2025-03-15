@@ -20,7 +20,7 @@ import (
 )
 
 const (
-	DefaultJobDuration = 10 * time.Minute
+	DefaultJobDuration = 30 * time.Second
 )
 
 type StackOverlowQuestionFetcher interface {
