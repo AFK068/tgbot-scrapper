@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"context"
 	"strconv"
 	"strings"
 
@@ -17,7 +18,7 @@ const (
 )
 
 type UserChecker interface {
-	CheckUserExistence(id int64) bool
+	CheckUserExistence(ctx context.Context, chatID int64) (bool, error)
 }
 
 func AuthLinkMiddleware(checker UserChecker, log *logger.Logger) echo.MiddlewareFunc {
@@ -47,7 +48,13 @@ func checkAuthLink(ctx echo.Context, checker UserChecker, log *logger.Logger) (b
 	}
 
 	// Check that user exists in the repository.
-	if !checker.CheckUserExistence(tgChatID) {
+	exist, err := checker.CheckUserExistence(ctx.Request().Context(), tgChatID)
+	if err != nil {
+		log.Error("Failed to check user existence", "Tg-Chat-Id", tgChatID, "error", err)
+		return false, handler.SendBadRequestResponse(ctx, handler.ErrInternalError, handler.ErrDescriptionInternalError)
+	}
+
+	if !exist {
 		log.Warn("User does not exist", "Tg-Chat-Id", tgChatID)
 		return false, handler.SendUnauthorizedResponse(ctx, handler.ErrChatNotExist, handler.ErrDescriptionChatNotExist)
 	}

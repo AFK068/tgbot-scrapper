@@ -27,7 +27,7 @@ func TestAuthLinkMiddleware_Success(t *testing.T) {
 	c := e.NewContext(req, rec)
 	c.SetPath("/links")
 
-	checkerMock.On("CheckUserExistence", int64(1)).Return(true)
+	checkerMock.On("CheckUserExistence", c.Request().Context(), int64(1)).Return(true, nil)
 
 	called := false
 	nextHandler := func(c echo.Context) error {
@@ -117,11 +117,33 @@ func TestAuthLinkMiddleware_UserNotExist(t *testing.T) {
 	c := e.NewContext(req, rec)
 	c.SetPath("/links")
 
-	checkerMock.On("CheckUserExistence", int64(123)).Return(false)
+	checkerMock.On("CheckUserExistence", c.Request().Context(), int64(123)).Return(false, nil)
 
 	err := mw(func(_ echo.Context) error { return nil })(c)
 
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusUnauthorized, rec.Code)
+	checkerMock.AssertExpectations(t)
+}
+
+func TestAuthLinkMiddleware_CheckUserError(t *testing.T) {
+	checkerMock := checker.NewUserChecker(t)
+	mw := middleware.AuthLinkMiddleware(checkerMock, logger.NewDiscardLogger())
+
+	req := httptest.NewRequest(http.MethodGet, "/links", http.NoBody)
+	rec := httptest.NewRecorder()
+
+	req.Header.Set("Tg-Chat-Id", "123")
+
+	e := echo.New()
+	c := e.NewContext(req, rec)
+	c.SetPath("/links")
+
+	checkerMock.On("CheckUserExistence", c.Request().Context(), int64(123)).Return(false, assert.AnError)
+
+	err := mw(func(_ echo.Context) error { return nil })(c)
+
+	assert.NoError(t, err)
+	assert.Equal(t, http.StatusBadRequest, rec.Code)
 	checkerMock.AssertExpectations(t)
 }

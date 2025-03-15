@@ -1,30 +1,18 @@
 package domain
 
+import "context"
+
 type ChatLinkRepository interface {
-	// Registers a chat in the repository.
-	RegisterChat(chatID int64) error
+	// Chat methods.
+	RegisterChat(ctx context.Context, uid int64) error
+	DeleteChat(ctx context.Context, uid int64) error
 
-	// Deletes a chat from the repository.
-	DeleteChat(chatID int64) error
-
-	// Save a link in the repository.
-	SaveLink(chatID int64, link *Link) error
-
-	// Delete a link from the repository.
-	DeleteLink(chatID int64, link *Link) error
-
-	// Get a list of links from the repository.
-	GetListLinks(chatID int64) ([]*Link, error)
-
-	// Check if the chat exists in the repository.
-	CheckUserExistence(chatID int64) bool
-
-	// Get all links from the repository.
-	GetAllLinks() []*Link
-
-	// Update time of the last check of the link.
-	UpdateLastCheck(link *Link) error
-
-	// Get chat IDs by link.
-	GetChatIDsByLink(link *Link) []int64
+	// Link methods.
+	SaveLink(ctx context.Context, uid int64, link *Link) error
+	DeleteLink(ctx context.Context, uid int64, link *Link) error
+	GetListLinks(ctx context.Context, uid int64) ([]*Link, error)
+	CheckUserExistence(ctx context.Context, uid int64) (bool, error)
+	GetAllLinks(ctx context.Context) ([]*Link, error)
+	UpdateLastCheck(ctx context.Context, link *Link) error
+	GetChatIDsByLink(ctx context.Context, link *Link) ([]int64, error)
 }

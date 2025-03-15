@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"sync"
 	"time"
 
@@ -19,84 +20,84 @@ func NewInMemoryLinkRepository() *InMemoryChatLinkRepository {
 	}
 }
 
-func (r *InMemoryChatLinkRepository) RegisterChat(chatID int64) error {
+func (r *InMemoryChatLinkRepository) RegisterChat(_ context.Context, uid int64) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
-	if _, ok := r.Links[chatID]; ok {
+	if _, ok := r.Links[uid]; ok {
 		return &apperrors.ChatAlreadyExistError{
 			Message: "Chat is already exist",
 		}
 	}
 
-	if _, ok := r.Links[chatID]; !ok {
-		r.Links[chatID] = make(map[string]*domain.Link)
+	if _, ok := r.Links[uid]; !ok {
+		r.Links[uid] = make(map[string]*domain.Link)
 	}
 
 	return nil
 }
 
-func (r *InMemoryChatLinkRepository) SaveLink(chatID int64, link *domain.Link) error {
+func (r *InMemoryChatLinkRepository) SaveLink(_ context.Context, uid int64, link *domain.Link) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
-	if _, ok := r.Links[chatID]; !ok {
-		r.Links[chatID] = make(map[string]*domain.Link)
+	if _, ok := r.Links[uid]; !ok {
+		r.Links[uid] = make(map[string]*domain.Link)
 	}
 
-	r.Links[chatID][link.URL] = link
+	r.Links[uid][link.URL] = link
 
 	return nil
 }
 
-func (r *InMemoryChatLinkRepository) DeleteChat(chatID int64) error {
+func (r *InMemoryChatLinkRepository) DeleteChat(_ context.Context, uid int64) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
-	delete(r.Links, chatID)
+	delete(r.Links, uid)
 
 	return nil
 }
 
-func (r *InMemoryChatLinkRepository) DeleteLink(chatID int64, link *domain.Link) error {
+func (r *InMemoryChatLinkRepository) DeleteLink(_ context.Context, uid int64, link *domain.Link) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
-	if _, ok := r.Links[chatID][link.URL]; !ok {
+	if _, ok := r.Links[uid][link.URL]; !ok {
 		return &apperrors.LinkIsNotExistError{
 			Message: "Link is not exist",
 		}
 	}
 
-	delete(r.Links[chatID], link.URL)
+	delete(r.Links[uid], link.URL)
 
 	return nil
 }
 
-func (r *InMemoryChatLinkRepository) GetListLinks(chatID int64) ([]*domain.Link, error) {
+func (r *InMemoryChatLinkRepository) GetListLinks(_ context.Context, uid int64) ([]*domain.Link, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
-	links := make([]*domain.Link, 0, len(r.Links[chatID]))
-	for _, link := range r.Links[chatID] {
+	links := make([]*domain.Link, 0, len(r.Links[uid]))
+	for _, link := range r.Links[uid] {
 		links = append(links, link)
 	}
 
 	return links, nil
 }
 
-func (r *InMemoryChatLinkRepository) CheckUserExistence(chatID int64) bool {
+func (r *InMemoryChatLinkRepository) CheckUserExistence(_ context.Context, uid int64) (bool, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
-	if _, ok := r.Links[chatID]; ok {
-		return true
+	if _, ok := r.Links[uid]; ok {
+		return true, nil
 	}
 
-	return false
+	return false, nil
 }
 
-func (r *InMemoryChatLinkRepository) GetAllLinks() []*domain.Link {
+func (r *InMemoryChatLinkRepository) GetAllLinks(_ context.Context) ([]*domain.Link, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
@@ -108,10 +109,10 @@ func (r *InMemoryChatLinkRepository) GetAllLinks() []*domain.Link {
 		}
 	}
 
-	return allLinks
+	return allLinks, nil
 }
 
-func (r *InMemoryChatLinkRepository) UpdateLastCheck(link *domain.Link) error {
+func (r *InMemoryChatLinkRepository) UpdateLastCheck(_ context.Context, link *domain.Link) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
@@ -126,7 +127,7 @@ func (r *InMemoryChatLinkRepository) UpdateLastCheck(link *domain.Link) error {
 	return nil
 }
 
-func (r *InMemoryChatLinkRepository) GetChatIDsByLink(link *domain.Link) []int64 {
+func (r *InMemoryChatLinkRepository) GetChatIDsByLink(_ context.Context, link *domain.Link) ([]int64, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
@@ -138,5 +139,5 @@ func (r *InMemoryChatLinkRepository) GetChatIDsByLink(link *domain.Link) []int64
 		}
 	}
 
-	return chatIDs
+	return chatIDs, nil
 }

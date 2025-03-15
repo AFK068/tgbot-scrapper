@@ -25,8 +25,8 @@ func TestPostTgChatId_Success(t *testing.T) {
 	repoMock := repomock.NewChatLinkRepository(t)
 	h := handler.NewScrapperHandler(repoMock, logger.NewDiscardLogger())
 
-	repoMock.On("CheckUserExistence", int64(123)).Return(false)
-	repoMock.On("RegisterChat", int64(123)).Return(nil)
+	repoMock.On("CheckUserExistence", mock.Anything, int64(123)).Return(false, nil)
+	repoMock.On("RegisterChat", mock.Anything, int64(123)).Return(nil)
 
 	req := httptest.NewRequest(http.MethodPost, "/tg-chat/123", http.NoBody)
 	rec := httptest.NewRecorder()
@@ -45,7 +45,7 @@ func TestPostTgChatId_AlreadyExists(t *testing.T) {
 	repoMock := repomock.NewChatLinkRepository(t)
 	h := handler.NewScrapperHandler(repoMock, logger.NewDiscardLogger())
 
-	repoMock.On("CheckUserExistence", int64(123)).Return(true)
+	repoMock.On("CheckUserExistence", mock.Anything, int64(123)).Return(true, nil)
 
 	req := httptest.NewRequest(http.MethodPost, "/tg-chat/123", http.NoBody)
 	rec := httptest.NewRecorder()
@@ -64,8 +64,8 @@ func TestPostTgChatId_Failure(t *testing.T) {
 	repoMock := repomock.NewChatLinkRepository(t)
 	h := handler.NewScrapperHandler(repoMock, logger.NewDiscardLogger())
 
-	repoMock.On("CheckUserExistence", int64(123)).Return(false)
-	repoMock.On("RegisterChat", int64(123)).Return(assert.AnError)
+	repoMock.On("CheckUserExistence", mock.Anything, int64(123)).Return(false, nil)
+	repoMock.On("RegisterChat", mock.Anything, int64(123)).Return(assert.AnError)
 
 	req := httptest.NewRequest(http.MethodPost, "/tg-chat/123", http.NoBody)
 	rec := httptest.NewRecorder()
@@ -84,8 +84,8 @@ func TestDeleteTgChatId_Success(t *testing.T) {
 	repoMock := repomock.NewChatLinkRepository(t)
 	h := handler.NewScrapperHandler(repoMock, logger.NewDiscardLogger())
 
-	repoMock.On("CheckUserExistence", int64(123)).Return(true)
-	repoMock.On("DeleteChat", int64(123)).Return(nil)
+	repoMock.On("CheckUserExistence", mock.Anything, int64(123)).Return(true, nil)
+	repoMock.On("DeleteChat", mock.Anything, int64(123)).Return(nil)
 
 	req := httptest.NewRequest(http.MethodDelete, "/tg-chat/123", http.NoBody)
 	rec := httptest.NewRecorder()
@@ -104,7 +104,7 @@ func TestDeleteTgChatId_UserNotFound(t *testing.T) {
 	repoMock := repomock.NewChatLinkRepository(t)
 	h := handler.NewScrapperHandler(repoMock, logger.NewDiscardLogger())
 
-	repoMock.On("CheckUserExistence", int64(123)).Return(false)
+	repoMock.On("CheckUserExistence", mock.Anything, int64(123)).Return(false, nil)
 
 	req := httptest.NewRequest(http.MethodDelete, "/tg-chat/123", http.NoBody)
 	rec := httptest.NewRecorder()
@@ -123,8 +123,8 @@ func TestDeleteTgChatId_Failure(t *testing.T) {
 	repoMock := repomock.NewChatLinkRepository(t)
 	h := handler.NewScrapperHandler(repoMock, logger.NewDiscardLogger())
 
-	repoMock.On("CheckUserExistence", int64(123)).Return(true)
-	repoMock.On("DeleteChat", int64(123)).Return(assert.AnError)
+	repoMock.On("CheckUserExistence", mock.Anything, int64(123)).Return(true, nil)
+	repoMock.On("DeleteChat", mock.Anything, int64(123)).Return(assert.AnError)
 
 	req := httptest.NewRequest(http.MethodDelete, "/tg-chat/123", http.NoBody)
 	rec := httptest.NewRecorder()
@@ -149,7 +149,7 @@ func TestPostLinks_Success(t *testing.T) {
 		Filters: &[]string{"filter1"},
 	}
 
-	repoMock.On("SaveLink", int64(123), mock.AnythingOfType("*domain.Link")).Return(nil)
+	repoMock.On("SaveLink", mock.Anything, int64(123), mock.AnythingOfType("*domain.Link")).Return(nil)
 
 	reqBody, err := json.Marshal(body)
 	assert.NoError(t, err)
@@ -203,7 +203,7 @@ func TestPostLinks_Failure(t *testing.T) {
 		Filters: &[]string{"filter1"},
 	}
 
-	repoMock.On("SaveLink", int64(123), mock.AnythingOfType("*domain.Link")).Return(assert.AnError)
+	repoMock.On("SaveLink", mock.Anything, int64(123), mock.AnythingOfType("*domain.Link")).Return(assert.AnError)
 
 	reqBody, err := json.Marshal(body)
 	assert.NoError(t, err)
@@ -229,7 +229,7 @@ func TestPostLinks_DuplicateLink(t *testing.T) {
 		Link: aws.String("https://github.com"),
 	}
 
-	repoMock.On("SaveLink", int64(123), mock.AnythingOfType("*domain.Link")).Return(nil).Twice()
+	repoMock.On("SaveLink", mock.Anything, int64(123), mock.AnythingOfType("*domain.Link")).Return(nil).Twice()
 
 	// First request.
 	reqBody1, err := json.Marshal(body)
@@ -268,7 +268,7 @@ func TestDeleteLinks_Success(t *testing.T) {
 		Link: aws.String("https://github.com"),
 	}
 
-	repoMock.On("DeleteLink", int64(123), mock.AnythingOfType("*domain.Link")).Return(nil)
+	repoMock.On("DeleteLink", mock.Anything, int64(123), mock.AnythingOfType("*domain.Link")).Return(nil)
 
 	reqBody, err := json.Marshal(body)
 	assert.NoError(t, err)
@@ -318,7 +318,7 @@ func TestDeleteLinks_LinkNotExist(t *testing.T) {
 		Link: aws.String("test"),
 	}
 
-	repoMock.On("DeleteLink", int64(123), mock.AnythingOfType("*domain.Link")).Return(&apperrors.LinkIsNotExistError{})
+	repoMock.On("DeleteLink", mock.Anything, int64(123), mock.AnythingOfType("*domain.Link")).Return(&apperrors.LinkIsNotExistError{})
 
 	reqBody, err := json.Marshal(body)
 	assert.NoError(t, err)
@@ -344,7 +344,7 @@ func TestDeleteLinks_Failure(t *testing.T) {
 		Link: aws.String("https://github.com"),
 	}
 
-	repoMock.On("DeleteLink", int64(123), mock.AnythingOfType("*domain.Link")).Return(assert.AnError)
+	repoMock.On("DeleteLink", mock.Anything, int64(123), mock.AnythingOfType("*domain.Link")).Return(assert.AnError)
 
 	reqBody, err := json.Marshal(body)
 	assert.NoError(t, err)
@@ -370,7 +370,7 @@ func TestGetLinks_Success(t *testing.T) {
 		{URL: "https://test", Tags: []string{"test_tag"}},
 	}
 
-	repoMock.On("GetListLinks", int64(123)).Return(expectedLinks, nil)
+	repoMock.On("GetListLinks", mock.Anything, int64(123)).Return(expectedLinks, nil)
 
 	req := httptest.NewRequest(http.MethodGet, "/links?TgChatId=123", http.NoBody)
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
@@ -397,7 +397,7 @@ func TestGetLinks_EmptyList(t *testing.T) {
 	repoMock := repomock.NewChatLinkRepository(t)
 	h := handler.NewScrapperHandler(repoMock, logger.NewDiscardLogger())
 
-	repoMock.On("GetListLinks", int64(123)).Return([]*domain.Link{}, nil)
+	repoMock.On("GetListLinks", mock.Anything, int64(123)).Return([]*domain.Link{}, nil)
 
 	req := httptest.NewRequest(http.MethodGet, "/links?TgChatId=123", http.NoBody)
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
@@ -422,7 +422,7 @@ func TestGetLinks_Failure(t *testing.T) {
 	repoMock := repomock.NewChatLinkRepository(t)
 	h := handler.NewScrapperHandler(repoMock, logger.NewDiscardLogger())
 
-	repoMock.On("GetListLinks", int64(123)).Return(nil, assert.AnError)
+	repoMock.On("GetListLinks", mock.Anything, int64(123)).Return(nil, assert.AnError)
 
 	req := httptest.NewRequest(http.MethodGet, "/links?TgChatId=123", http.NoBody)
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)

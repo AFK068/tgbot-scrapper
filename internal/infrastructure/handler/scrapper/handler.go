@@ -29,12 +29,18 @@ func NewScrapperHandler(repo domain.ChatLinkRepository, log *logger.Logger) *Scr
 func (h *ScrapperHandler) PostTgChatId(ctx echo.Context, id int64) error { //nolint:revive,stylecheck // according to codgen interface
 	h.Logger.Info("Registering chat", "ID", id)
 
-	if h.repository.CheckUserExistence(id) {
+	exist, err := h.repository.CheckUserExistence(ctx.Request().Context(), id)
+	if err != nil {
+		h.Logger.Error("Failed to check user existence", "ID", id, "error", err)
+		return SendBadRequestResponse(ctx, ErrInternalError, ErrDescriptionInternalError)
+	}
+
+	if exist {
 		h.Logger.Warn("Chat already exists", "ID", id)
 		return SendBadRequestResponse(ctx, ErrChatAlreadyExist, ErrDescriptionChatAlreadyExist)
 	}
 
-	if err := h.repository.RegisterChat(id); err != nil {
+	if err := h.repository.RegisterChat(ctx.Request().Context(), id); err != nil {
 		h.Logger.Error("Failed to register chat", "ID", id, "error", err)
 		return SendBadRequestResponse(ctx, ErrInternalError, ErrDescriptionInternalError)
 	}
@@ -49,12 +55,18 @@ func (h *ScrapperHandler) PostTgChatId(ctx echo.Context, id int64) error { //nol
 func (h *ScrapperHandler) DeleteTgChatId(ctx echo.Context, id int64) error { //nolint:revive,stylecheck // according to codgen interface
 	h.Logger.Info("Removing chat", "ID", id)
 
-	if !h.repository.CheckUserExistence(id) {
+	exist, err := h.repository.CheckUserExistence(ctx.Request().Context(), id)
+	if err != nil {
+		h.Logger.Error("Failed to check user existence", "ID", id, "error", err)
+		return SendBadRequestResponse(ctx, ErrInternalError, ErrDescriptionInternalError)
+	}
+
+	if !exist {
 		h.Logger.Warn("Chat does not exist", "ID", id)
 		return SendNotFoundResponse(ctx, ErrChatNotExist, ErrDescriptionChatNotExist)
 	}
 
-	if err := h.repository.DeleteChat(id); err != nil {
+	if err := h.repository.DeleteChat(ctx.Request().Context(), id); err != nil {
 		h.Logger.Error("Failed to remove chat", "ID", id, "error", err)
 		return SendBadRequestResponse(ctx, ErrInternalError, ErrDescriptionInternalError)
 	}
@@ -94,7 +106,7 @@ func (h *ScrapperHandler) PostLinks(ctx echo.Context, params api.PostLinksParams
 		return SendBadRequestResponse(ctx, ErrInternalError, ErrDescriptionInternalError)
 	}
 
-	if err := h.repository.SaveLink(params.TgChatId, link); err != nil {
+	if err := h.repository.SaveLink(ctx.Request().Context(), params.TgChatId, link); err != nil {
 		h.Logger.Error("Failed to save link for chat", "ID", params.TgChatId, "error", err)
 		return SendBadRequestResponse(ctx, ErrInternalError, ErrDescriptionInternalError)
 	}
@@ -124,7 +136,7 @@ func (h *ScrapperHandler) DeleteLinks(ctx echo.Context, params api.DeleteLinksPa
 		URL: *req.Link,
 	}
 
-	err := h.repository.DeleteLink(params.TgChatId, link)
+	err := h.repository.DeleteLink(ctx.Request().Context(), params.TgChatId, link)
 
 	var linkNotExistErr *apperrors.LinkIsNotExistError
 	if errors.As(err, &linkNotExistErr) {
@@ -147,7 +159,7 @@ func (h *ScrapperHandler) DeleteLinks(ctx echo.Context, params api.DeleteLinksPa
 func (h *ScrapperHandler) GetLinks(ctx echo.Context, params api.GetLinksParams) error {
 	h.Logger.Info("Getting links for chat", "ID", params.TgChatId)
 
-	links, err := h.repository.GetListLinks(params.TgChatId)
+	links, err := h.repository.GetListLinks(ctx.Request().Context(), params.TgChatId)
 	if err != nil {
 		h.Logger.Error("Failed to get links for chat", "ID", params.TgChatId, "error", err)
 		return SendBadRequestResponse(ctx, ErrInternalError, ErrDescriptionInternalError)

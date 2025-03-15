@@ -31,9 +31,9 @@ func TestScrapper_GitHubLinkUpdate(t *testing.T) {
 		LastCheck: time.Now().Add(-1 * time.Hour),
 	}
 
-	repo.On("GetAllLinks").Return([]*domain.Link{testLink})
-	repo.On("GetChatIDsByLink", testLink).Return([]int64{123})
-	repo.On("UpdateLastCheck", testLink).Return(nil)
+	repo.On("GetAllLinks", mock.Anything).Return([]*domain.Link{testLink}, nil)
+	repo.On("GetChatIDsByLink", mock.Anything, testLink).Return([]int64{123}, nil)
+	repo.On("UpdateLastCheck", mock.Anything, testLink).Return(nil)
 
 	githubClient.On("GetRepo", mock.Anything, testLink.URL).Return(&github.Repository{
 		UpdatedAt: time.Now(),
@@ -66,9 +66,9 @@ func TestScrapper_StackOverflowLinkUpdate(t *testing.T) {
 		LastCheck: time.Now().Add(-1 * time.Hour),
 	}
 
-	repo.On("GetAllLinks").Return([]*domain.Link{testLink})
-	repo.On("GetChatIDsByLink", testLink).Return([]int64{123})
-	repo.On("UpdateLastCheck", testLink).Return(nil)
+	repo.On("GetAllLinks", mock.Anything).Return([]*domain.Link{testLink}, nil)
+	repo.On("GetChatIDsByLink", mock.Anything, testLink).Return([]int64{123}, nil)
+	repo.On("UpdateLastCheck", mock.Anything, testLink).Return(nil)
 
 	stackoverflowClient.On("GetQuestion", mock.Anything, testLink.URL).Return(&stackoverflow.Question{
 		LastActivityDate: time.Now().Unix(),

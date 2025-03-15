@@ -84,9 +84,16 @@ func (s *Scrapper) Run(jobDuration time.Duration) {
 
 func (s *Scrapper) notifyBot(ctx context.Context, link *domain.Link) error {
 	s.logger.Info("Notifying bot for link", "url", link.URL)
+
+	chatIDs, err := s.repository.GetChatIDsByLink(ctx, link)
+	if err != nil {
+		s.logger.Error("Failed to get chat IDs by link", "error", err)
+		return fmt.Errorf("failed to get chat IDs by link: %w", err)
+	}
+
 	update := botapi.LinkUpdate{
 		Url:       &link.URL,
-		TgChatIds: utils.SliceInt64Ptr(s.repository.GetChatIDsByLink(link)),
+		TgChatIds: utils.SliceInt64Ptr(chatIDs),
 	}
 
 	if err := s.botClient.PostUpdates(ctx, update); err != nil {
@@ -129,7 +136,12 @@ func (s *Scrapper) scrappeLinksTask() {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	links := s.repository.GetAllLinks()
+	links, err := s.repository.GetAllLinks(ctx)
+	if err != nil {
+		s.logger.Error("Failed to get all links", "error", err)
+		return
+	}
+
 	sema := make(chan struct{}, runtime.NumCPU()*4)
 
 	var wg sync.WaitGroup
@@ -173,7 +185,7 @@ func (s *Scrapper) scrappeLinksTask() {
 			}
 
 			// Update the last check time.
-			err = s.repository.UpdateLastCheck(l)
+			err = s.repository.UpdateLastCheck(ctx, l)
 			if err != nil {
 				s.logger.Error("Error updating last check", "error", err)
 				return
