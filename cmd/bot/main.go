@@ -1,6 +1,10 @@
 package main
 
 import (
+	"context"
+	"os/signal"
+	"syscall"
+
 	"go.uber.org/fx"
 
 	"github.com/AFK068/bot/config"
@@ -8,8 +12,7 @@ import (
 	"github.com/AFK068/bot/internal/infrastructure/clients/scrapper"
 	"github.com/AFK068/bot/internal/infrastructure/logger"
 	"github.com/AFK068/bot/internal/infrastructure/server"
-
-	handler "github.com/AFK068/bot/internal/infrastructure/handler/bot"
+	"github.com/AFK068/bot/internal/infrastructure/telegram/botapi"
 )
 
 const (
@@ -44,20 +47,27 @@ func main() {
 			),
 
 			// Provide bot handler.
-			handler.NewBotHandler,
+			botapi.NewBotHandler,
 
 			// Provide bot server.
 			server.NewBotServer,
 		),
 		fx.Invoke(
 			// Run bot.
-			func(b bot.Service) error {
-				return b.Run()
+			func(b bot.Service, log *logger.Logger) error {
+				ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+				defer stop()
+
+				err := b.Run(ctx)
+				if err != nil {
+					log.Error("Failed to run bot", "error", err)
+				}
+
+				return err
 			},
 
-			// Start bot server.
-			func(s *server.BotServer) error {
-				return s.Start()
+			func(s *server.BotServer, lc fx.Lifecycle, log *logger.Logger) {
+				s.RegisterHooks(lc, log)
 			},
 		),
 	).Run()
