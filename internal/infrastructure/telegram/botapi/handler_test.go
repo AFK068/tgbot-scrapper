@@ -1,4 +1,4 @@
-package handler_test
+package botapi_test
 
 import (
 	"bytes"
@@ -12,26 +12,26 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/AFK068/bot/internal/infrastructure/logger"
+	"github.com/AFK068/bot/internal/infrastructure/telegram/botapi"
 
-	botapi "github.com/AFK068/bot/internal/api/openapi/bot/v1"
+	bottypes "github.com/AFK068/bot/internal/api/openapi/bot/v1"
 	botmocks "github.com/AFK068/bot/internal/application/bot/mocks"
-	handler "github.com/AFK068/bot/internal/infrastructure/handler/bot"
 )
 
-func TestPostUpdates_Success(t *testing.T) {
+func Test_PostUpdates_Success(t *testing.T) {
 	botMock := botmocks.NewService(t)
-	h := handler.NewBotHandler(botMock, logger.NewDiscardLogger())
+	h := botapi.NewBotHandler(botMock, logger.NewDiscardLogger())
 
 	botMock.On("SendMessage", int64(123), "Link updated: https://test\nDescription: Test description").Once()
 	botMock.On("SendMessage", int64(456), "Link updated: https://test").Once()
 
 	testCases := []struct {
 		name string
-		body botapi.LinkUpdate
+		body bottypes.LinkUpdate
 	}{
 		{
 			name: "With description",
-			body: botapi.LinkUpdate{
+			body: bottypes.LinkUpdate{
 				TgChatIds:   &[]int64{123},
 				Url:         aws.String("https://test"),
 				Description: aws.String("Test description"),
@@ -39,7 +39,7 @@ func TestPostUpdates_Success(t *testing.T) {
 		},
 		{
 			name: "Without description",
-			body: botapi.LinkUpdate{
+			body: bottypes.LinkUpdate{
 				TgChatIds: &[]int64{456},
 				Url:       aws.String("https://test"),
 			},
@@ -65,9 +65,9 @@ func TestPostUpdates_Success(t *testing.T) {
 	}
 }
 
-func TestPostUpdates_InvalidBody(t *testing.T) {
+func Test_PostUpdates_InvalidBody(t *testing.T) {
 	botMock := botmocks.NewService(t)
-	h := handler.NewBotHandler(botMock, logger.NewDiscardLogger())
+	h := botapi.NewBotHandler(botMock, logger.NewDiscardLogger())
 
 	req := httptest.NewRequest(http.MethodPost, "/updates", bytes.NewReader([]byte(`Invalid_body`)))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
@@ -82,24 +82,24 @@ func TestPostUpdates_InvalidBody(t *testing.T) {
 	botMock.AssertNotCalled(t, "SendMessage")
 }
 
-func TestPostUpdates_EmptyTgChatIDs(t *testing.T) {
+func Test_PostUpdates_EmptyTgChatIDs(t *testing.T) {
 	botMock := botmocks.NewService(t)
-	h := handler.NewBotHandler(botMock, logger.NewDiscardLogger())
+	h := botapi.NewBotHandler(botMock, logger.NewDiscardLogger())
 
 	testCases := []struct {
 		name string
-		body botapi.LinkUpdate
+		body bottypes.LinkUpdate
 	}{
 		{
 			name: "Empty TgChatIDs",
-			body: botapi.LinkUpdate{
+			body: bottypes.LinkUpdate{
 				TgChatIds: &[]int64{},
 				Url:       aws.String("https://test"),
 			},
 		},
 		{
 			name: "Nil TgChatIDs",
-			body: botapi.LinkUpdate{
+			body: bottypes.LinkUpdate{
 				Url: aws.String("https://test"),
 			},
 		},
@@ -124,24 +124,24 @@ func TestPostUpdates_EmptyTgChatIDs(t *testing.T) {
 	}
 }
 
-func TestPostUpdates_EmptyURL(t *testing.T) {
+func Test_PostUpdates_EmptyURL(t *testing.T) {
 	botMock := botmocks.NewService(t)
-	h := handler.NewBotHandler(botMock, logger.NewDiscardLogger())
+	h := botapi.NewBotHandler(botMock, logger.NewDiscardLogger())
 
 	testCases := []struct {
 		name string
-		body botapi.LinkUpdate
+		body bottypes.LinkUpdate
 	}{
 		{
 			name: "Empty URL",
-			body: botapi.LinkUpdate{
+			body: bottypes.LinkUpdate{
 				TgChatIds: &[]int64{123},
 				Url:       aws.String(""),
 			},
 		},
 		{
 			name: "Nil URL",
-			body: botapi.LinkUpdate{
+			body: bottypes.LinkUpdate{
 				TgChatIds: &[]int64{123},
 			},
 		},

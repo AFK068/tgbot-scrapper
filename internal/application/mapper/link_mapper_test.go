@@ -12,13 +12,13 @@ import (
 	"github.com/AFK068/bot/internal/domain"
 	"github.com/AFK068/bot/internal/domain/apperrors"
 
-	api "github.com/AFK068/bot/internal/api/openapi/scrapper/v1"
+	scrappertypes "github.com/AFK068/bot/internal/api/openapi/scrapper/v1"
 )
 
-func TestMapAddLinkRequestToDomain_Success(t *testing.T) {
+func Test_MapAddLinkRequestToDomain_Success(t *testing.T) {
 	type args struct {
 		userID  int64
-		request *api.AddLinkRequest
+		request *scrappertypes.AddLinkRequest
 	}
 
 	tests := []struct {
@@ -30,7 +30,7 @@ func TestMapAddLinkRequestToDomain_Success(t *testing.T) {
 			name: "GitHub link success",
 			args: args{
 				userID: 1,
-				request: &api.AddLinkRequest{
+				request: &scrappertypes.AddLinkRequest{
 					Link:    aws.String("https://github.com/test"),
 					Tags:    &[]string{"tag"},
 					Filters: &[]string{"filter"},
@@ -42,7 +42,7 @@ func TestMapAddLinkRequestToDomain_Success(t *testing.T) {
 			name: "StackOverflow link success",
 			args: args{
 				userID: 1,
-				request: &api.AddLinkRequest{
+				request: &scrappertypes.AddLinkRequest{
 					Link:    aws.String("https://stackoverflow.com/test"),
 					Tags:    &[]string{"tag"},
 					Filters: &[]string{"filter"},
@@ -54,7 +54,7 @@ func TestMapAddLinkRequestToDomain_Success(t *testing.T) {
 			name: "LastCheck set correctly",
 			args: args{
 				userID: 1,
-				request: &api.AddLinkRequest{
+				request: &scrappertypes.AddLinkRequest{
 					Link: aws.String("https://github.com/test"),
 				},
 			},
@@ -87,10 +87,10 @@ func TestMapAddLinkRequestToDomain_Success(t *testing.T) {
 	}
 }
 
-func TestMapAddLinkRequestToDomain_Failure(t *testing.T) {
+func Test_MapAddLinkRequestToDomain_Failure(t *testing.T) {
 	type args struct {
 		userID  int64
-		request *api.AddLinkRequest
+		request *scrappertypes.AddLinkRequest
 	}
 
 	tests := []struct {
@@ -103,7 +103,7 @@ func TestMapAddLinkRequestToDomain_Failure(t *testing.T) {
 			name: "Empty link failure",
 			args: args{
 				userID:  1,
-				request: &api.AddLinkRequest{},
+				request: &scrappertypes.AddLinkRequest{},
 			},
 			expectErr: true,
 			errType:   &apperrors.LinkValidateError{},
@@ -112,7 +112,7 @@ func TestMapAddLinkRequestToDomain_Failure(t *testing.T) {
 			name: "Unsupported link type failure",
 			args: args{
 				userID: 1,
-				request: &api.AddLinkRequest{
+				request: &scrappertypes.AddLinkRequest{
 					Link: aws.String("https://test.com"),
 				},
 			},

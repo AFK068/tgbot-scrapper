@@ -14,7 +14,7 @@ import (
 	checker "github.com/AFK068/bot/internal/middleware/mocks"
 )
 
-func TestAuthLinkMiddleware_Success(t *testing.T) {
+func Test_AuthLinkMiddleware_Success(t *testing.T) {
 	checkerMock := checker.NewUserChecker(t)
 	mw := middleware.AuthLinkMiddleware(checkerMock, logger.NewDiscardLogger())
 
@@ -43,7 +43,7 @@ func TestAuthLinkMiddleware_Success(t *testing.T) {
 	checkerMock.AssertExpectations(t)
 }
 
-func TestAuthLinkMiddleware_SkipNonLinksPath(t *testing.T) {
+func Test_AuthLinkMiddleware_SkipNonLinksPath(t *testing.T) {
 	checkerMock := checker.NewUserChecker(t)
 	mw := middleware.AuthLinkMiddleware(checkerMock, logger.NewDiscardLogger())
 
@@ -66,7 +66,7 @@ func TestAuthLinkMiddleware_SkipNonLinksPath(t *testing.T) {
 	checkerMock.AssertExpectations(t)
 }
 
-func TestAuthLinkMiddleware_MissingHeader(t *testing.T) {
+func Test_AuthLinkMiddleware_MissingHeader(t *testing.T) {
 	checkerMock := checker.NewUserChecker(t)
 	mw := middleware.AuthLinkMiddleware(checkerMock, logger.NewDiscardLogger())
 
@@ -84,7 +84,7 @@ func TestAuthLinkMiddleware_MissingHeader(t *testing.T) {
 	checkerMock.AssertExpectations(t)
 }
 
-func TestAuthLinkMiddleware_InvalidHeader(t *testing.T) {
+func Test_AuthLinkMiddleware_InvalidHeader(t *testing.T) {
 	checkerMock := checker.NewUserChecker(t)
 	mw := middleware.AuthLinkMiddleware(checkerMock, logger.NewDiscardLogger())
 
@@ -104,7 +104,7 @@ func TestAuthLinkMiddleware_InvalidHeader(t *testing.T) {
 	checkerMock.AssertExpectations(t)
 }
 
-func TestAuthLinkMiddleware_UserNotExist(t *testing.T) {
+func Test_AuthLinkMiddleware_UserNotExist(t *testing.T) {
 	checkerMock := checker.NewUserChecker(t)
 	mw := middleware.AuthLinkMiddleware(checkerMock, logger.NewDiscardLogger())
 
@@ -126,7 +126,7 @@ func TestAuthLinkMiddleware_UserNotExist(t *testing.T) {
 	checkerMock.AssertExpectations(t)
 }
 
-func TestAuthLinkMiddleware_CheckUserError(t *testing.T) {
+func Test_AuthLinkMiddleware_CheckUserError(t *testing.T) {
 	checkerMock := checker.NewUserChecker(t)
 	mw := middleware.AuthLinkMiddleware(checkerMock, logger.NewDiscardLogger())
 

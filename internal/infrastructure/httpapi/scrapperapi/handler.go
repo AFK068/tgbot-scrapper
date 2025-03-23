@@ -1,4 +1,4 @@
-package handler
+package scrapperapi
 
 import (
 	"errors"
@@ -12,7 +12,7 @@ import (
 	"github.com/AFK068/bot/internal/infrastructure/logger"
 	"github.com/AFK068/bot/pkg/utils"
 
-	api "github.com/AFK068/bot/internal/api/openapi/scrapper/v1"
+	scrappertypes "github.com/AFK068/bot/internal/api/openapi/scrapper/v1"
 )
 
 type ScrapperHandler struct {
@@ -78,10 +78,10 @@ func (h *ScrapperHandler) DeleteTgChatId(ctx echo.Context, id int64) error { //n
 
 // Add link tracking.
 // (POST /links).
-func (h *ScrapperHandler) PostLinks(ctx echo.Context, params api.PostLinksParams) error {
+func (h *ScrapperHandler) PostLinks(ctx echo.Context, params scrappertypes.PostLinksParams) error {
 	h.Logger.Info("Adding link for chat", "ID", params.TgChatId)
 
-	var req api.AddLinkRequest
+	var req scrappertypes.AddLinkRequest
 	if err := ctx.Bind(&req); err != nil {
 		h.Logger.Warn("Invalid request body", "error", err)
 		return SendBadRequestResponse(ctx, ErrInvalidRequestBody, ErrDescriptionInvalidBody)
@@ -118,10 +118,10 @@ func (h *ScrapperHandler) PostLinks(ctx echo.Context, params api.PostLinksParams
 
 // Remove link tracking.
 // (DELETE /links).
-func (h *ScrapperHandler) DeleteLinks(ctx echo.Context, params api.DeleteLinksParams) error {
+func (h *ScrapperHandler) DeleteLinks(ctx echo.Context, params scrappertypes.DeleteLinksParams) error {
 	h.Logger.Info("Removing link for chat", "ID", params.TgChatId)
 
-	var req api.RemoveLinkRequest
+	var req scrappertypes.RemoveLinkRequest
 	if err := ctx.Bind(&req); err != nil {
 		h.Logger.Warn("Invalid request body", "error", err)
 		return SendBadRequestResponse(ctx, ErrInvalidRequestBody, ErrDescriptionInvalidBody)
@@ -156,7 +156,7 @@ func (h *ScrapperHandler) DeleteLinks(ctx echo.Context, params api.DeleteLinksPa
 
 // Get all tracked links.
 // (GET /links).
-func (h *ScrapperHandler) GetLinks(ctx echo.Context, params api.GetLinksParams) error {
+func (h *ScrapperHandler) GetLinks(ctx echo.Context, params scrappertypes.GetLinksParams) error {
 	h.Logger.Info("Getting links for chat", "ID", params.TgChatId)
 
 	links, err := h.repository.GetListLinks(ctx.Request().Context(), params.TgChatId)
@@ -168,15 +168,15 @@ func (h *ScrapperHandler) GetLinks(ctx echo.Context, params api.GetLinksParams) 
 	if len(links) == 0 {
 		h.Logger.Info("No links found for chat", "ID", params.TgChatId)
 
-		return SendSuccessResponse(ctx, api.ListLinksResponse{
-			Links: &[]api.LinkResponse{},
+		return SendSuccessResponse(ctx, scrappertypes.ListLinksResponse{
+			Links: &[]scrappertypes.LinkResponse{},
 			Size:  aws.Int32(0),
 		})
 	}
 
-	linksResp := make([]api.LinkResponse, len(links))
+	linksResp := make([]scrappertypes.LinkResponse, len(links))
 	for i, link := range links {
-		linksResp[i] = api.LinkResponse{
+		linksResp[i] = scrappertypes.LinkResponse{
 			Url:     aws.String(link.URL),
 			Tags:    utils.SliceStringPtr(link.Tags),
 			Filters: utils.SliceStringPtr(link.Filters),
@@ -185,7 +185,7 @@ func (h *ScrapperHandler) GetLinks(ctx echo.Context, params api.GetLinksParams) 
 
 	h.Logger.Info("Successfully retrieved links for chat", "ID", params.TgChatId)
 
-	return SendSuccessResponse(ctx, api.ListLinksResponse{
+	return SendSuccessResponse(ctx, scrappertypes.ListLinksResponse{
 		Links: &linksResp,
 		Size:  aws.Int32(int32(len(linksResp))), //nolint:gosec // as per the requirements
 	})

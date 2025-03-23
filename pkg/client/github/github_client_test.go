@@ -14,7 +14,7 @@ import (
 	"github.com/AFK068/bot/pkg/client/github"
 )
 
-func TestGetRepo_Success(t *testing.T) {
+func Test_GetRepo_Success(t *testing.T) {
 	expectedTime, err := time.Parse(time.RFC3339, "2011-01-26T19:14:43Z")
 	require.NoError(t, err)
 
@@ -47,7 +47,7 @@ func TestGetRepo_Success(t *testing.T) {
 	assert.Equal(t, expectedTime, repo.UpdatedAt)
 }
 
-func TestGetRepo_InvalidLink(t *testing.T) {
+func Test_GetRepo_InvalidLink(t *testing.T) {
 	client := github.NewClient()
 	_, err := client.GetRepo(context.Background(), "https://bad_link")
 

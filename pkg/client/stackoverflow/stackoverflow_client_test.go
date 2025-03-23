@@ -14,7 +14,7 @@ import (
 	"github.com/AFK068/bot/pkg/client/stackoverflow"
 )
 
-func TestGetRepo_Success(t *testing.T) {
+func Test_GetRepo_Success(t *testing.T) {
 	expectedTime := time.Unix(123456789, 0)
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -50,7 +50,7 @@ func TestGetRepo_Success(t *testing.T) {
 	assert.Equal(t, expectedTime.Unix(), question.LastActivityDate)
 }
 
-func TestGetRepo_InvalidLink(t *testing.T) {
+func Test_GetRepo_InvalidLink(t *testing.T) {
 	client := stackoverflow.NewClient()
 	_, err := client.GetQuestion(context.Background(), "https://bad_link")
 

@@ -7,10 +7,17 @@ import (
 )
 
 const (
-	StateIdle           = "idle"
-	StateAwaitingURL    = "awaiting_url"
-	StateAwaitingTags   = "awaiting_tags"
-	StateAwaitingFilter = "awaiting_filter"
+	ConversationStateIdle           = "idle"
+	ConversationStateAwaitingURL    = "awaiting_url"
+	ConversationStateAwaitingTags   = "awaiting_tags"
+	ConversationStateAwaitingFilter = "awaiting_filter"
+
+	EventStartTrack = "start_track"
+	EventSetURL     = "set_url"
+	EventSetTags    = "set_tags"
+	EventComplete   = "complete"
+
+	EnterState = "enter_state"
 )
 
 type Conversation struct {
@@ -21,21 +28,21 @@ type Conversation struct {
 	FSM     *fsm.FSM
 }
 
-func NewConversation(chatID int64) *Conversation {
+func NewConversationWithFSM(chatID int64) *Conversation {
 	conversation := &Conversation{
 		ChatID: chatID,
 	}
 
 	conversation.FSM = fsm.NewFSM(
-		StateIdle,
+		ConversationStateIdle,
 		fsm.Events{
-			{Name: "start_track", Src: []string{StateIdle}, Dst: StateAwaitingURL},
-			{Name: "set_url", Src: []string{StateAwaitingURL}, Dst: StateAwaitingTags},
-			{Name: "set_tags", Src: []string{StateAwaitingTags}, Dst: StateAwaitingFilter},
-			{Name: "complete", Src: []string{StateAwaitingFilter}, Dst: StateIdle},
+			{Name: EventStartTrack, Src: []string{ConversationStateIdle}, Dst: ConversationStateAwaitingURL},
+			{Name: EventSetURL, Src: []string{ConversationStateAwaitingURL}, Dst: ConversationStateAwaitingTags},
+			{Name: EventSetTags, Src: []string{ConversationStateAwaitingTags}, Dst: ConversationStateAwaitingFilter},
+			{Name: EventComplete, Src: []string{ConversationStateAwaitingFilter}, Dst: ConversationStateIdle},
 		},
 		fsm.Callbacks{
-			"enter_state": func(_ context.Context, _ *fsm.Event) {},
+			EnterState: func(_ context.Context, _ *fsm.Event) {},
 		},
 	)
 

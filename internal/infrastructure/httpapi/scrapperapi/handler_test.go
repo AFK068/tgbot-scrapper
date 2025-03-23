@@ -1,4 +1,4 @@
-package handler_test
+package scrapperapi_test
 
 import (
 	"bytes"
@@ -14,16 +14,16 @@ import (
 
 	"github.com/AFK068/bot/internal/domain"
 	"github.com/AFK068/bot/internal/domain/apperrors"
+	"github.com/AFK068/bot/internal/infrastructure/httpapi/scrapperapi"
 	"github.com/AFK068/bot/internal/infrastructure/logger"
 
-	scrapperapi "github.com/AFK068/bot/internal/api/openapi/scrapper/v1"
+	scrappertypes "github.com/AFK068/bot/internal/api/openapi/scrapper/v1"
 	repomock "github.com/AFK068/bot/internal/domain/mocks"
-	handler "github.com/AFK068/bot/internal/infrastructure/handler/scrapper"
 )
 
-func TestPostTgChatId_Success(t *testing.T) {
+func Test_PostTgChatId_Success(t *testing.T) {
 	repoMock := repomock.NewChatLinkRepository(t)
-	h := handler.NewScrapperHandler(repoMock, logger.NewDiscardLogger())
+	h := scrapperapi.NewScrapperHandler(repoMock, logger.NewDiscardLogger())
 
 	repoMock.On("CheckUserExistence", mock.Anything, int64(123)).Return(false, nil)
 	repoMock.On("RegisterChat", mock.Anything, int64(123)).Return(nil)
@@ -41,9 +41,9 @@ func TestPostTgChatId_Success(t *testing.T) {
 	repoMock.AssertExpectations(t)
 }
 
-func TestPostTgChatId_AlreadyExists(t *testing.T) {
+func Test_PostTgChatId_AlreadyExists(t *testing.T) {
 	repoMock := repomock.NewChatLinkRepository(t)
-	h := handler.NewScrapperHandler(repoMock, logger.NewDiscardLogger())
+	h := scrapperapi.NewScrapperHandler(repoMock, logger.NewDiscardLogger())
 
 	repoMock.On("CheckUserExistence", mock.Anything, int64(123)).Return(true, nil)
 
@@ -60,9 +60,9 @@ func TestPostTgChatId_AlreadyExists(t *testing.T) {
 	repoMock.AssertExpectations(t)
 }
 
-func TestPostTgChatId_Failure(t *testing.T) {
+func Test_PostTgChatId_Failure(t *testing.T) {
 	repoMock := repomock.NewChatLinkRepository(t)
-	h := handler.NewScrapperHandler(repoMock, logger.NewDiscardLogger())
+	h := scrapperapi.NewScrapperHandler(repoMock, logger.NewDiscardLogger())
 
 	repoMock.On("CheckUserExistence", mock.Anything, int64(123)).Return(false, nil)
 	repoMock.On("RegisterChat", mock.Anything, int64(123)).Return(assert.AnError)
@@ -80,9 +80,9 @@ func TestPostTgChatId_Failure(t *testing.T) {
 	repoMock.AssertExpectations(t)
 }
 
-func TestDeleteTgChatId_Success(t *testing.T) {
+func Test_DeleteTgChatId_Success(t *testing.T) {
 	repoMock := repomock.NewChatLinkRepository(t)
-	h := handler.NewScrapperHandler(repoMock, logger.NewDiscardLogger())
+	h := scrapperapi.NewScrapperHandler(repoMock, logger.NewDiscardLogger())
 
 	repoMock.On("CheckUserExistence", mock.Anything, int64(123)).Return(true, nil)
 	repoMock.On("DeleteChat", mock.Anything, int64(123)).Return(nil)
@@ -100,9 +100,9 @@ func TestDeleteTgChatId_Success(t *testing.T) {
 	repoMock.AssertExpectations(t)
 }
 
-func TestDeleteTgChatId_UserNotFound(t *testing.T) {
+func Test_DeleteTgChatId_UserNotFound(t *testing.T) {
 	repoMock := repomock.NewChatLinkRepository(t)
-	h := handler.NewScrapperHandler(repoMock, logger.NewDiscardLogger())
+	h := scrapperapi.NewScrapperHandler(repoMock, logger.NewDiscardLogger())
 
 	repoMock.On("CheckUserExistence", mock.Anything, int64(123)).Return(false, nil)
 
@@ -119,9 +119,9 @@ func TestDeleteTgChatId_UserNotFound(t *testing.T) {
 	repoMock.AssertExpectations(t)
 }
 
-func TestDeleteTgChatId_Failure(t *testing.T) {
+func Test_DeleteTgChatId_Failure(t *testing.T) {
 	repoMock := repomock.NewChatLinkRepository(t)
-	h := handler.NewScrapperHandler(repoMock, logger.NewDiscardLogger())
+	h := scrapperapi.NewScrapperHandler(repoMock, logger.NewDiscardLogger())
 
 	repoMock.On("CheckUserExistence", mock.Anything, int64(123)).Return(true, nil)
 	repoMock.On("DeleteChat", mock.Anything, int64(123)).Return(assert.AnError)
@@ -139,11 +139,11 @@ func TestDeleteTgChatId_Failure(t *testing.T) {
 	repoMock.AssertExpectations(t)
 }
 
-func TestPostLinks_Success(t *testing.T) {
+func Test_PostLinks_Success(t *testing.T) {
 	repoMock := repomock.NewChatLinkRepository(t)
-	h := handler.NewScrapperHandler(repoMock, logger.NewDiscardLogger())
+	h := scrapperapi.NewScrapperHandler(repoMock, logger.NewDiscardLogger())
 
-	body := scrapperapi.AddLinkRequest{
+	body := scrappertypes.AddLinkRequest{
 		Link:    aws.String("https://github.com"),
 		Tags:    &[]string{"tag1"},
 		Filters: &[]string{"filter1"},
@@ -160,18 +160,18 @@ func TestPostLinks_Success(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := echo.New().NewContext(req, rec)
 
-	err = h.PostLinks(c, scrapperapi.PostLinksParams{TgChatId: 123})
+	err = h.PostLinks(c, scrappertypes.PostLinksParams{TgChatId: 123})
 
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusOK, rec.Code)
 	repoMock.AssertExpectations(t)
 }
 
-func TestPostLinks_InvalidLink(t *testing.T) {
+func Test_PostLinks_InvalidLink(t *testing.T) {
 	repoMock := repomock.NewChatLinkRepository(t)
-	h := handler.NewScrapperHandler(repoMock, logger.NewDiscardLogger())
+	h := scrapperapi.NewScrapperHandler(repoMock, logger.NewDiscardLogger())
 
-	body := scrapperapi.AddLinkRequest{
+	body := scrappertypes.AddLinkRequest{
 		Link:    aws.String("test"),
 		Tags:    &[]string{"tag1"},
 		Filters: &[]string{"filter1"},
@@ -186,18 +186,18 @@ func TestPostLinks_InvalidLink(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := echo.New().NewContext(req, rec)
 
-	err = h.PostLinks(c, scrapperapi.PostLinksParams{TgChatId: 123})
+	err = h.PostLinks(c, scrappertypes.PostLinksParams{TgChatId: 123})
 
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusBadRequest, rec.Code)
 	repoMock.AssertExpectations(t)
 }
 
-func TestPostLinks_Failure(t *testing.T) {
+func Test_PostLinks_Failure(t *testing.T) {
 	repoMock := repomock.NewChatLinkRepository(t)
-	h := handler.NewScrapperHandler(repoMock, logger.NewDiscardLogger())
+	h := scrapperapi.NewScrapperHandler(repoMock, logger.NewDiscardLogger())
 
-	body := scrapperapi.AddLinkRequest{
+	body := scrappertypes.AddLinkRequest{
 		Link:    aws.String("https://github.com"),
 		Tags:    &[]string{"tag1"},
 		Filters: &[]string{"filter1"},
@@ -214,18 +214,18 @@ func TestPostLinks_Failure(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := echo.New().NewContext(req, rec)
 
-	err = h.PostLinks(c, scrapperapi.PostLinksParams{TgChatId: 123})
+	err = h.PostLinks(c, scrappertypes.PostLinksParams{TgChatId: 123})
 
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusBadRequest, rec.Code)
 	repoMock.AssertExpectations(t)
 }
 
-func TestPostLinks_DuplicateLink(t *testing.T) {
+func Test_PostLinks_DuplicateLink(t *testing.T) {
 	repoMock := repomock.NewChatLinkRepository(t)
-	h := handler.NewScrapperHandler(repoMock, logger.NewDiscardLogger())
+	h := scrapperapi.NewScrapperHandler(repoMock, logger.NewDiscardLogger())
 
-	body := scrapperapi.AddLinkRequest{
+	body := scrappertypes.AddLinkRequest{
 		Link: aws.String("https://github.com"),
 	}
 
@@ -240,7 +240,7 @@ func TestPostLinks_DuplicateLink(t *testing.T) {
 
 	rec1 := httptest.NewRecorder()
 	c1 := echo.New().NewContext(req1, rec1)
-	err = h.PostLinks(c1, scrapperapi.PostLinksParams{TgChatId: 123})
+	err = h.PostLinks(c1, scrappertypes.PostLinksParams{TgChatId: 123})
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusOK, rec1.Code)
 
@@ -253,18 +253,18 @@ func TestPostLinks_DuplicateLink(t *testing.T) {
 
 	rec2 := httptest.NewRecorder()
 	c2 := echo.New().NewContext(req2, rec2)
-	err = h.PostLinks(c2, scrapperapi.PostLinksParams{TgChatId: 123})
+	err = h.PostLinks(c2, scrappertypes.PostLinksParams{TgChatId: 123})
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusOK, rec2.Code)
 
 	repoMock.AssertExpectations(t)
 }
 
-func TestDeleteLinks_Success(t *testing.T) {
+func Test_DeleteLinks_Success(t *testing.T) {
 	repoMock := repomock.NewChatLinkRepository(t)
-	h := handler.NewScrapperHandler(repoMock, logger.NewDiscardLogger())
+	h := scrapperapi.NewScrapperHandler(repoMock, logger.NewDiscardLogger())
 
-	body := scrapperapi.RemoveLinkRequest{
+	body := scrappertypes.RemoveLinkRequest{
 		Link: aws.String("https://github.com"),
 	}
 
@@ -279,18 +279,18 @@ func TestDeleteLinks_Success(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := echo.New().NewContext(req, rec)
 
-	err = h.DeleteLinks(c, scrapperapi.DeleteLinksParams{TgChatId: 123})
+	err = h.DeleteLinks(c, scrappertypes.DeleteLinksParams{TgChatId: 123})
 
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusOK, rec.Code)
 	repoMock.AssertExpectations(t)
 }
 
-func TestDeleteLinks_InvalidLink(t *testing.T) {
+func Test_DeleteLinks_InvalidLink(t *testing.T) {
 	repoMock := repomock.NewChatLinkRepository(t)
-	h := handler.NewScrapperHandler(repoMock, logger.NewDiscardLogger())
+	h := scrapperapi.NewScrapperHandler(repoMock, logger.NewDiscardLogger())
 
-	body := scrapperapi.RemoveLinkRequest{
+	body := scrappertypes.RemoveLinkRequest{
 		Link: aws.String(""),
 	}
 
@@ -303,18 +303,18 @@ func TestDeleteLinks_InvalidLink(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := echo.New().NewContext(req, rec)
 
-	err = h.DeleteLinks(c, scrapperapi.DeleteLinksParams{TgChatId: 123})
+	err = h.DeleteLinks(c, scrappertypes.DeleteLinksParams{TgChatId: 123})
 
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusBadRequest, rec.Code)
 	repoMock.AssertExpectations(t)
 }
 
-func TestDeleteLinks_LinkNotExist(t *testing.T) {
+func Test_DeleteLinks_LinkNotExist(t *testing.T) {
 	repoMock := repomock.NewChatLinkRepository(t)
-	h := handler.NewScrapperHandler(repoMock, logger.NewDiscardLogger())
+	h := scrapperapi.NewScrapperHandler(repoMock, logger.NewDiscardLogger())
 
-	body := scrapperapi.RemoveLinkRequest{
+	body := scrappertypes.RemoveLinkRequest{
 		Link: aws.String("test"),
 	}
 
@@ -329,18 +329,18 @@ func TestDeleteLinks_LinkNotExist(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := echo.New().NewContext(req, rec)
 
-	err = h.DeleteLinks(c, scrapperapi.DeleteLinksParams{TgChatId: 123})
+	err = h.DeleteLinks(c, scrappertypes.DeleteLinksParams{TgChatId: 123})
 
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusNotFound, rec.Code)
 	repoMock.AssertExpectations(t)
 }
 
-func TestDeleteLinks_Failure(t *testing.T) {
+func Test_DeleteLinks_Failure(t *testing.T) {
 	repoMock := repomock.NewChatLinkRepository(t)
-	h := handler.NewScrapperHandler(repoMock, logger.NewDiscardLogger())
+	h := scrapperapi.NewScrapperHandler(repoMock, logger.NewDiscardLogger())
 
-	body := scrapperapi.RemoveLinkRequest{
+	body := scrappertypes.RemoveLinkRequest{
 		Link: aws.String("https://github.com"),
 	}
 
@@ -355,16 +355,16 @@ func TestDeleteLinks_Failure(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := echo.New().NewContext(req, rec)
 
-	err = h.DeleteLinks(c, scrapperapi.DeleteLinksParams{TgChatId: 123})
+	err = h.DeleteLinks(c, scrappertypes.DeleteLinksParams{TgChatId: 123})
 
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusBadRequest, rec.Code)
 	repoMock.AssertExpectations(t)
 }
 
-func TestGetLinks_Success(t *testing.T) {
+func Test_GetLinks_Success(t *testing.T) {
 	repoMock := repomock.NewChatLinkRepository(t)
-	h := handler.NewScrapperHandler(repoMock, logger.NewDiscardLogger())
+	h := scrapperapi.NewScrapperHandler(repoMock, logger.NewDiscardLogger())
 
 	expectedLinks := []*domain.Link{
 		{URL: "https://test", Tags: []string{"test_tag"}},
@@ -378,12 +378,12 @@ func TestGetLinks_Success(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := echo.New().NewContext(req, rec)
 
-	err := h.GetLinks(c, scrapperapi.GetLinksParams{TgChatId: 123})
+	err := h.GetLinks(c, scrappertypes.GetLinksParams{TgChatId: 123})
 
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusOK, rec.Code)
 
-	var resp scrapperapi.ListLinksResponse
+	var resp scrappertypes.ListLinksResponse
 	err = json.NewDecoder(rec.Body).Decode(&resp)
 	assert.NoError(t, err)
 
@@ -393,9 +393,9 @@ func TestGetLinks_Success(t *testing.T) {
 	repoMock.AssertExpectations(t)
 }
 
-func TestGetLinks_EmptyList(t *testing.T) {
+func Test_GetLinks_EmptyList(t *testing.T) {
 	repoMock := repomock.NewChatLinkRepository(t)
-	h := handler.NewScrapperHandler(repoMock, logger.NewDiscardLogger())
+	h := scrapperapi.NewScrapperHandler(repoMock, logger.NewDiscardLogger())
 
 	repoMock.On("GetListLinks", mock.Anything, int64(123)).Return([]*domain.Link{}, nil)
 
@@ -405,12 +405,12 @@ func TestGetLinks_EmptyList(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := echo.New().NewContext(req, rec)
 
-	err := h.GetLinks(c, scrapperapi.GetLinksParams{TgChatId: 123})
+	err := h.GetLinks(c, scrappertypes.GetLinksParams{TgChatId: 123})
 
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusOK, rec.Code)
 
-	var resp scrapperapi.ListLinksResponse
+	var resp scrappertypes.ListLinksResponse
 	err = json.NewDecoder(rec.Body).Decode(&resp)
 	assert.NoError(t, err)
 
@@ -418,9 +418,9 @@ func TestGetLinks_EmptyList(t *testing.T) {
 	repoMock.AssertExpectations(t)
 }
 
-func TestGetLinks_Failure(t *testing.T) {
+func Test_GetLinks_Failure(t *testing.T) {
 	repoMock := repomock.NewChatLinkRepository(t)
-	h := handler.NewScrapperHandler(repoMock, logger.NewDiscardLogger())
+	h := scrapperapi.NewScrapperHandler(repoMock, logger.NewDiscardLogger())
 
 	repoMock.On("GetListLinks", mock.Anything, int64(123)).Return(nil, assert.AnError)
 
@@ -430,7 +430,7 @@ func TestGetLinks_Failure(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := echo.New().NewContext(req, rec)
 
-	err := h.GetLinks(c, scrapperapi.GetLinksParams{TgChatId: 123})
+	err := h.GetLinks(c, scrappertypes.GetLinksParams{TgChatId: 123})
 
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusBadRequest, rec.Code)

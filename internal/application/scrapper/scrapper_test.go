@@ -13,13 +13,13 @@ import (
 	"github.com/AFK068/bot/pkg/client/github"
 	"github.com/AFK068/bot/pkg/client/stackoverflow"
 
-	botapi "github.com/AFK068/bot/internal/api/openapi/bot/v1"
+	bottypes "github.com/AFK068/bot/internal/api/openapi/bot/v1"
 	scrapperMock "github.com/AFK068/bot/internal/application/scrapper/mocks"
 	repoMock "github.com/AFK068/bot/internal/domain/mocks"
 	botMock "github.com/AFK068/bot/internal/infrastructure/clients/bot/mocks"
 )
 
-func TestScrapper_GitHubLinkUpdate(t *testing.T) {
+func Test_Scrapper_GitHubLinkUpdate(t *testing.T) {
 	repo := repoMock.NewChatLinkRepository(t)
 	githubClient := scrapperMock.NewGitHubRepoFetcher(t)
 	stackoverflowClient := scrapperMock.NewStackOverlowQuestionFetcher(t)
@@ -39,7 +39,7 @@ func TestScrapper_GitHubLinkUpdate(t *testing.T) {
 		UpdatedAt: time.Now(),
 	}, nil)
 
-	botClient.On("PostUpdates", mock.Anything, mock.MatchedBy(func(update botapi.LinkUpdate) bool {
+	botClient.On("PostUpdates", mock.Anything, mock.MatchedBy(func(update bottypes.LinkUpdate) bool {
 		return *update.Url == testLink.URL && (*update.TgChatIds)[0] == 123
 	})).Return(nil)
 
@@ -54,7 +54,7 @@ func TestScrapper_GitHubLinkUpdate(t *testing.T) {
 	botClient.AssertExpectations(t)
 }
 
-func TestScrapper_StackOverflowLinkUpdate(t *testing.T) {
+func Test_Scrapper_StackOverflowLinkUpdate(t *testing.T) {
 	repo := repoMock.NewChatLinkRepository(t)
 	githubClient := scrapperMock.NewGitHubRepoFetcher(t)
 	stackoverflowClient := scrapperMock.NewStackOverlowQuestionFetcher(t)
@@ -74,7 +74,7 @@ func TestScrapper_StackOverflowLinkUpdate(t *testing.T) {
 		LastActivityDate: time.Now().Unix(),
 	}, nil)
 
-	botClient.On("PostUpdates", mock.Anything, mock.MatchedBy(func(update botapi.LinkUpdate) bool {
+	botClient.On("PostUpdates", mock.Anything, mock.MatchedBy(func(update bottypes.LinkUpdate) bool {
 		return *update.Url == testLink.URL && (*update.TgChatIds)[0] == 123
 	})).Return(nil)
 

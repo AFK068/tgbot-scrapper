@@ -6,7 +6,7 @@ import (
 
 	"github.com/AFK068/bot/internal/domain/apperrors"
 
-	api "github.com/AFK068/bot/internal/api/openapi/scrapper/v1"
+	scrappertypes "github.com/AFK068/bot/internal/api/openapi/scrapper/v1"
 )
 
 func (c *Client) handleResponse(code int, body []byte) error {
@@ -15,7 +15,7 @@ func (c *Client) handleResponse(code int, body []byte) error {
 		c.Logger.Info("Request successful")
 		return nil
 	case http.StatusBadRequest, http.StatusNotFound, http.StatusUnauthorized:
-		var apiErr api.ApiErrorResponse
+		var apiErr scrappertypes.ApiErrorResponse
 		if err := json.Unmarshal(body, &apiErr); err != nil {
 			c.Logger.Error("Failed to decode error response", "error", err)
 

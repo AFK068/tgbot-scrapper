@@ -1,4 +1,4 @@
-package handler
+package scrapperapi
 
 import (
 	"net/http"
@@ -6,7 +6,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/labstack/echo/v4"
 
-	api "github.com/AFK068/bot/internal/api/openapi/scrapper/v1"
+	scrappertypes "github.com/AFK068/bot/internal/api/openapi/scrapper/v1"
 )
 
 const (
@@ -34,7 +34,7 @@ func SendSuccessResponse(ctx echo.Context, data any) error {
 }
 
 func SendBadRequestResponse(ctx echo.Context, err, description string) error {
-	return ctx.JSON(http.StatusBadRequest, api.ApiErrorResponse{
+	return ctx.JSON(http.StatusBadRequest, scrappertypes.ApiErrorResponse{
 		Description:      aws.String(description),
 		Code:             aws.String("400"),
 		ExceptionMessage: aws.String(err),
@@ -42,7 +42,7 @@ func SendBadRequestResponse(ctx echo.Context, err, description string) error {
 }
 
 func SendNotFoundResponse(ctx echo.Context, err, description string) error {
-	return ctx.JSON(http.StatusNotFound, api.ApiErrorResponse{
+	return ctx.JSON(http.StatusNotFound, scrappertypes.ApiErrorResponse{
 		Description:      aws.String(description),
 		Code:             aws.String("404"),
 		ExceptionMessage: aws.String(err),
@@ -50,7 +50,7 @@ func SendNotFoundResponse(ctx echo.Context, err, description string) error {
 }
 
 func SendUnauthorizedResponse(ctx echo.Context, err, description string) error {
-	return ctx.JSON(http.StatusUnauthorized, api.ApiErrorResponse{
+	return ctx.JSON(http.StatusUnauthorized, scrappertypes.ApiErrorResponse{
 		Description:      aws.String(description),
 		Code:             aws.String("401"),
 		ExceptionMessage: aws.String(err),

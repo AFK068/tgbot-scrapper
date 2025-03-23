@@ -1,4 +1,4 @@
-package handler
+package botapi
 
 import (
 	"net/http"
@@ -6,7 +6,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/labstack/echo/v4"
 
-	botapi "github.com/AFK068/bot/internal/api/openapi/bot/v1"
+	bottypes "github.com/AFK068/bot/internal/api/openapi/bot/v1"
 )
 
 const (
@@ -24,7 +24,7 @@ func SendSuccessResponse(ctx echo.Context, data any) error {
 }
 
 func SendBadRequestResponse(ctx echo.Context, err, description string) error {
-	return ctx.JSON(http.StatusBadRequest, botapi.ApiErrorResponse{
+	return ctx.JSON(http.StatusBadRequest, bottypes.ApiErrorResponse{
 		Description:      aws.String(description),
 		Code:             aws.String("400"),
 		ExceptionMessage: aws.String(err),

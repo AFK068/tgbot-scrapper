@@ -10,15 +10,15 @@ import (
 
 	"github.com/AFK068/bot/internal/infrastructure/logger"
 
-	api "github.com/AFK068/bot/internal/api/openapi/scrapper/v1"
+	scrappertypes "github.com/AFK068/bot/internal/api/openapi/scrapper/v1"
 )
 
 type Service interface {
 	PostTgChatID(ctx context.Context, id int64) error
 	DeleteTgChatID(ctx context.Context, id int64) error
-	PostLinks(ctx context.Context, tgChatID int64, link api.AddLinkRequest) error
-	DeleteLinks(ctx context.Context, tgChatID int64, link api.RemoveLinkRequest) error
-	GetLinks(ctx context.Context, tgChatID int64) (api.ListLinksResponse, error)
+	PostLinks(ctx context.Context, tgChatID int64, link scrappertypes.AddLinkRequest) error
+	DeleteLinks(ctx context.Context, tgChatID int64, link scrappertypes.RemoveLinkRequest) error
+	GetLinks(ctx context.Context, tgChatID int64) (scrappertypes.ListLinksResponse, error)
 }
 
 type Client struct {
@@ -69,7 +69,7 @@ func (c *Client) DeleteTgChatID(ctx context.Context, id int64) error {
 	return c.handleResponse(resp.StatusCode(), resp.Body())
 }
 
-func (c *Client) PostLinks(ctx context.Context, tgChatID int64, link api.AddLinkRequest) error {
+func (c *Client) PostLinks(ctx context.Context, tgChatID int64, link scrappertypes.AddLinkRequest) error {
 	url := fmt.Sprintf("%s/links", c.BaseURL)
 	c.Logger.Info("Posting Links", "url", url, "tgChatID", tgChatID, "link", link)
 
@@ -88,7 +88,7 @@ func (c *Client) PostLinks(ctx context.Context, tgChatID int64, link api.AddLink
 	return c.handleResponse(resp.StatusCode(), resp.Body())
 }
 
-func (c *Client) DeleteLinks(ctx context.Context, tgChatID int64, link api.RemoveLinkRequest) error {
+func (c *Client) DeleteLinks(ctx context.Context, tgChatID int64, link scrappertypes.RemoveLinkRequest) error {
 	url := fmt.Sprintf("%s/links", c.BaseURL)
 	c.Logger.Info("Deleting Links", "url", url, "tgChatID", tgChatID, "link", link)
 
@@ -107,7 +107,7 @@ func (c *Client) DeleteLinks(ctx context.Context, tgChatID int64, link api.Remov
 	return c.handleResponse(resp.StatusCode(), resp.Body())
 }
 
-func (c *Client) GetLinks(ctx context.Context, tgChatID int64) (api.ListLinksResponse, error) {
+func (c *Client) GetLinks(ctx context.Context, tgChatID int64) (scrappertypes.ListLinksResponse, error) {
 	url := fmt.Sprintf("%s/links", c.BaseURL)
 	c.Logger.Info("Getting Links", "url", url, "tgChatID", tgChatID)
 
@@ -119,16 +119,16 @@ func (c *Client) GetLinks(ctx context.Context, tgChatID int64) (api.ListLinksRes
 		Get(url)
 	if err != nil {
 		c.Logger.Error("Failed to get Links", "error", err)
-		return api.ListLinksResponse{}, fmt.Errorf("failed to do request: %w", err)
+		return scrappertypes.ListLinksResponse{}, fmt.Errorf("failed to do request: %w", err)
 	}
 
 	if err := c.handleResponse(resp.StatusCode(), resp.Body()); err != nil {
-		return api.ListLinksResponse{}, err
+		return scrappertypes.ListLinksResponse{}, err
 	}
 
-	var links api.ListLinksResponse
+	var links scrappertypes.ListLinksResponse
 	if err := json.Unmarshal(resp.Body(), &links); err != nil {
-		return api.ListLinksResponse{}, fmt.Errorf("failed to unmarshal response: %w", err)
+		return scrappertypes.ListLinksResponse{}, fmt.Errorf("failed to unmarshal response: %w", err)
 	}
 
 	return links, nil

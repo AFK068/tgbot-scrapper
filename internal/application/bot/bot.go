@@ -1,6 +1,7 @@
 package bot
 
 import (
+	"context"
 	"fmt"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
@@ -11,7 +12,7 @@ import (
 )
 
 type Service interface {
-	Run() error
+	Run(ctx context.Context) error
 	SendMessage(chatID int64, text string, replyMarkup ...interface{})
 }
 
@@ -28,28 +29,25 @@ func NewBot(log *logger.Logger, cfg *config.BotConfig, sc *scrapper.Client) *Bot
 		Logger:         log,
 		Config:         cfg,
 		ScrapperClient: sc,
+		StateManager:   NewStateManager(),
 	}
 }
 
-func (b *Bot) Run() error {
+func (b *Bot) Run(ctx context.Context) error {
 	if err := b.setBotAPI(); err != nil {
-		b.Logger.Error("Failed to set bot API", "error", err)
-
 		return fmt.Errorf("setting bot api: %w", err)
 	}
 
 	if err := b.setBotCommands(); err != nil {
-		b.Logger.Error("Failed to set bot commands", "error", err)
-
 		return fmt.Errorf("setting bot commands: %w", err)
 	}
 
-	b.StateManager = NewStateManager()
-
 	updates := b.initUpdatesChannel()
-	go b.processUpdates(updates)
+	go b.processUpdates(ctx, updates)
 
 	b.Logger.Info("Bot is running")
+
+	<-ctx.Done()
 
 	return nil
 }
@@ -89,16 +87,25 @@ func (b *Bot) SendMessage(chatID int64, text string, replyMarkup ...interface{})
 	)
 }
 
-func (b *Bot) processUpdates(updates tgbotapi.UpdatesChannel) {
-	for update := range updates {
-		if update.Message == nil {
-			continue
-		}
+func (b *Bot) processUpdates(ctx context.Context, updates tgbotapi.UpdatesChannel) {
+	for {
+		select {
+		case update, ok := <-updates:
+			if !ok {
+				return
+			}
 
-		if update.Message.IsCommand() {
-			b.handleCommand(update.Message)
-		} else {
-			b.handleMessage(update.Message)
+			if update.Message == nil {
+				continue
+			}
+
+			if update.Message.IsCommand() {
+				b.handleCommand(update.Message)
+			} else {
+				b.handleMessage(update.Message)
+			}
+		case <-ctx.Done():
+			return
 		}
 	}
 }

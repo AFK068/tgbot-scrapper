@@ -16,11 +16,11 @@ import (
 	"github.com/AFK068/bot/pkg/client/stackoverflow"
 	"github.com/AFK068/bot/pkg/utils"
 
-	botapi "github.com/AFK068/bot/internal/api/openapi/bot/v1"
+	bottypes "github.com/AFK068/bot/internal/api/openapi/bot/v1"
 )
 
 const (
-	DefaultJobDuration = 30 * time.Second
+	DefaultJobDuration = 15 * time.Second
 )
 
 type StackOverlowQuestionFetcher interface {
@@ -91,7 +91,7 @@ func (s *Scrapper) notifyBot(ctx context.Context, link *domain.Link) error {
 		return fmt.Errorf("failed to get chat IDs by link: %w", err)
 	}
 
-	update := botapi.LinkUpdate{
+	update := bottypes.LinkUpdate{
 		Url:       &link.URL,
 		TgChatIds: utils.SliceInt64Ptr(chatIDs),
 	}

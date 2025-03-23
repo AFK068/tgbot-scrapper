@@ -22,9 +22,9 @@ func (_m *ChatLinkRepository) EXPECT() *ChatLinkRepository_Expecter {
 	return &ChatLinkRepository_Expecter{mock: &_m.Mock}
 }
 
-// CheckUserExistence provides a mock function with given fields: ctx, chatID
-func (_m *ChatLinkRepository) CheckUserExistence(ctx context.Context, chatID int64) (bool, error) {
-	ret := _m.Called(ctx, chatID)
+// CheckUserExistence provides a mock function with given fields: ctx, uid
+func (_m *ChatLinkRepository) CheckUserExistence(ctx context.Context, uid int64) (bool, error) {
+	ret := _m.Called(ctx, uid)
 
 	if len(ret) == 0 {
 		panic("no return value specified for CheckUserExistence")
@@ -33,16 +33,16 @@ func (_m *ChatLinkRepository) CheckUserExistence(ctx context.Context, chatID int
 	var r0 bool
 	var r1 error
 	if rf, ok := ret.Get(0).(func(context.Context, int64) (bool, error)); ok {
-		return rf(ctx, chatID)
+		return rf(ctx, uid)
 	}
 	if rf, ok := ret.Get(0).(func(context.Context, int64) bool); ok {
-		r0 = rf(ctx, chatID)
+		r0 = rf(ctx, uid)
 	} else {
 		r0 = ret.Get(0).(bool)
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context, int64) error); ok {
-		r1 = rf(ctx, chatID)
+		r1 = rf(ctx, uid)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -57,12 +57,12 @@ type ChatLinkRepository_CheckUserExistence_Call struct {
 
 // CheckUserExistence is a helper method to define mock.On call
 //   - ctx context.Context
-//   - chatID int64
-func (_e *ChatLinkRepository_Expecter) CheckUserExistence(ctx interface{}, chatID interface{}) *ChatLinkRepository_CheckUserExistence_Call {
-	return &ChatLinkRepository_CheckUserExistence_Call{Call: _e.mock.On("CheckUserExistence", ctx, chatID)}
+//   - uid int64
+func (_e *ChatLinkRepository_Expecter) CheckUserExistence(ctx interface{}, uid interface{}) *ChatLinkRepository_CheckUserExistence_Call {
+	return &ChatLinkRepository_CheckUserExistence_Call{Call: _e.mock.On("CheckUserExistence", ctx, uid)}
 }
 
-func (_c *ChatLinkRepository_CheckUserExistence_Call) Run(run func(ctx context.Context, chatID int64)) *ChatLinkRepository_CheckUserExistence_Call {
+func (_c *ChatLinkRepository_CheckUserExistence_Call) Run(run func(ctx context.Context, uid int64)) *ChatLinkRepository_CheckUserExistence_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(int64))
 	})
@@ -79,9 +79,9 @@ func (_c *ChatLinkRepository_CheckUserExistence_Call) RunAndReturn(run func(cont
 	return _c
 }
 
-// DeleteChat provides a mock function with given fields: ctx, chatID
-func (_m *ChatLinkRepository) DeleteChat(ctx context.Context, chatID int64) error {
-	ret := _m.Called(ctx, chatID)
+// DeleteChat provides a mock function with given fields: ctx, uid
+func (_m *ChatLinkRepository) DeleteChat(ctx context.Context, uid int64) error {
+	ret := _m.Called(ctx, uid)
 
 	if len(ret) == 0 {
 		panic("no return value specified for DeleteChat")
@@ -89,7 +89,7 @@ func (_m *ChatLinkRepository) DeleteChat(ctx context.Context, chatID int64) erro
 
 	var r0 error
 	if rf, ok := ret.Get(0).(func(context.Context, int64) error); ok {
-		r0 = rf(ctx, chatID)
+		r0 = rf(ctx, uid)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -104,12 +104,12 @@ type ChatLinkRepository_DeleteChat_Call struct {
 
 // DeleteChat is a helper method to define mock.On call
 //   - ctx context.Context
-//   - chatID int64
-func (_e *ChatLinkRepository_Expecter) DeleteChat(ctx interface{}, chatID interface{}) *ChatLinkRepository_DeleteChat_Call {
-	return &ChatLinkRepository_DeleteChat_Call{Call: _e.mock.On("DeleteChat", ctx, chatID)}
+//   - uid int64
+func (_e *ChatLinkRepository_Expecter) DeleteChat(ctx interface{}, uid interface{}) *ChatLinkRepository_DeleteChat_Call {
+	return &ChatLinkRepository_DeleteChat_Call{Call: _e.mock.On("DeleteChat", ctx, uid)}
 }
 
-func (_c *ChatLinkRepository_DeleteChat_Call) Run(run func(ctx context.Context, chatID int64)) *ChatLinkRepository_DeleteChat_Call {
+func (_c *ChatLinkRepository_DeleteChat_Call) Run(run func(ctx context.Context, uid int64)) *ChatLinkRepository_DeleteChat_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(int64))
 	})
@@ -291,9 +291,9 @@ func (_c *ChatLinkRepository_GetChatIDsByLink_Call) RunAndReturn(run func(contex
 	return _c
 }
 
-// GetListLinks provides a mock function with given fields: ctx, chatID
-func (_m *ChatLinkRepository) GetListLinks(ctx context.Context, chatID int64) ([]*domain.Link, error) {
-	ret := _m.Called(ctx, chatID)
+// GetListLinks provides a mock function with given fields: ctx, uid
+func (_m *ChatLinkRepository) GetListLinks(ctx context.Context, uid int64) ([]*domain.Link, error) {
+	ret := _m.Called(ctx, uid)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetListLinks")
@@ -302,10 +302,10 @@ func (_m *ChatLinkRepository) GetListLinks(ctx context.Context, chatID int64) ([
 	var r0 []*domain.Link
 	var r1 error
 	if rf, ok := ret.Get(0).(func(context.Context, int64) ([]*domain.Link, error)); ok {
-		return rf(ctx, chatID)
+		return rf(ctx, uid)
 	}
 	if rf, ok := ret.Get(0).(func(context.Context, int64) []*domain.Link); ok {
-		r0 = rf(ctx, chatID)
+		r0 = rf(ctx, uid)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).([]*domain.Link)
@@ -313,7 +313,7 @@ func (_m *ChatLinkRepository) GetListLinks(ctx context.Context, chatID int64) ([
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context, int64) error); ok {
-		r1 = rf(ctx, chatID)
+		r1 = rf(ctx, uid)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -328,12 +328,12 @@ type ChatLinkRepository_GetListLinks_Call struct {
 
 // GetListLinks is a helper method to define mock.On call
 //   - ctx context.Context
-//   - chatID int64
-func (_e *ChatLinkRepository_Expecter) GetListLinks(ctx interface{}, chatID interface{}) *ChatLinkRepository_GetListLinks_Call {
-	return &ChatLinkRepository_GetListLinks_Call{Call: _e.mock.On("GetListLinks", ctx, chatID)}
+//   - uid int64
+func (_e *ChatLinkRepository_Expecter) GetListLinks(ctx interface{}, uid interface{}) *ChatLinkRepository_GetListLinks_Call {
+	return &ChatLinkRepository_GetListLinks_Call{Call: _e.mock.On("GetListLinks", ctx, uid)}
 }
 
-func (_c *ChatLinkRepository_GetListLinks_Call) Run(run func(ctx context.Context, chatID int64)) *ChatLinkRepository_GetListLinks_Call {
+func (_c *ChatLinkRepository_GetListLinks_Call) Run(run func(ctx context.Context, uid int64)) *ChatLinkRepository_GetListLinks_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(int64))
 	})
@@ -350,9 +350,9 @@ func (_c *ChatLinkRepository_GetListLinks_Call) RunAndReturn(run func(context.Co
 	return _c
 }
 
-// RegisterChat provides a mock function with given fields: ctx, chatID
-func (_m *ChatLinkRepository) RegisterChat(ctx context.Context, chatID int64) error {
-	ret := _m.Called(ctx, chatID)
+// RegisterChat provides a mock function with given fields: ctx, uid
+func (_m *ChatLinkRepository) RegisterChat(ctx context.Context, uid int64) error {
+	ret := _m.Called(ctx, uid)
 
 	if len(ret) == 0 {
 		panic("no return value specified for RegisterChat")
@@ -360,7 +360,7 @@ func (_m *ChatLinkRepository) RegisterChat(ctx context.Context, chatID int64) er
 
 	var r0 error
 	if rf, ok := ret.Get(0).(func(context.Context, int64) error); ok {
-		r0 = rf(ctx, chatID)
+		r0 = rf(ctx, uid)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -375,12 +375,12 @@ type ChatLinkRepository_RegisterChat_Call struct {
 
 // RegisterChat is a helper method to define mock.On call
 //   - ctx context.Context
-//   - chatID int64
-func (_e *ChatLinkRepository_Expecter) RegisterChat(ctx interface{}, chatID interface{}) *ChatLinkRepository_RegisterChat_Call {
-	return &ChatLinkRepository_RegisterChat_Call{Call: _e.mock.On("RegisterChat", ctx, chatID)}
+//   - uid int64
+func (_e *ChatLinkRepository_Expecter) RegisterChat(ctx interface{}, uid interface{}) *ChatLinkRepository_RegisterChat_Call {
+	return &ChatLinkRepository_RegisterChat_Call{Call: _e.mock.On("RegisterChat", ctx, uid)}
 }
 
-func (_c *ChatLinkRepository_RegisterChat_Call) Run(run func(ctx context.Context, chatID int64)) *ChatLinkRepository_RegisterChat_Call {
+func (_c *ChatLinkRepository_RegisterChat_Call) Run(run func(ctx context.Context, uid int64)) *ChatLinkRepository_RegisterChat_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(int64))
 	})

@@ -23,7 +23,7 @@ func (sm *StateManager) GetConversation(chatID int64) *Conversation {
 		return conv
 	}
 
-	conv := NewConversation(chatID)
+	conv := NewConversationWithFSM(chatID)
 	sm.conversations[chatID] = conv
 
 	return conv

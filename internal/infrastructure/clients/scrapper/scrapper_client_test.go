@@ -13,10 +13,10 @@ import (
 	"github.com/AFK068/bot/internal/infrastructure/clients/scrapper"
 	"github.com/AFK068/bot/internal/infrastructure/logger"
 
-	api "github.com/AFK068/bot/internal/api/openapi/scrapper/v1"
+	scrappertypes "github.com/AFK068/bot/internal/api/openapi/scrapper/v1"
 )
 
-func TestPostTgChatID(t *testing.T) {
+func Test_PostTgChatID(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodPost, r.Method)
 
@@ -35,7 +35,7 @@ func TestPostTgChatID(t *testing.T) {
 	assert.NoError(t, err)
 }
 
-func TestDeleteTgChatID(t *testing.T) {
+func Test_DeleteTgChatID(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodDelete, r.Method)
 
@@ -54,8 +54,8 @@ func TestDeleteTgChatID(t *testing.T) {
 	assert.NoError(t, err)
 }
 
-func TestPostLinks(t *testing.T) {
-	reqBody := api.AddLinkRequest{
+func Test_PostLinks(t *testing.T) {
+	reqBody := scrappertypes.AddLinkRequest{
 		Link:    aws.String("https://example.com"),
 		Tags:    &[]string{"tag"},
 		Filters: &[]string{"filter"},
@@ -71,7 +71,7 @@ func TestPostLinks(t *testing.T) {
 		assert.Equal(t, r.Header.Get("Content-Type"), "application/json")
 		assert.Equal(t, r.Header.Get("Accept"), "application/json")
 
-		var body api.AddLinkRequest
+		var body scrappertypes.AddLinkRequest
 		err := json.NewDecoder(r.Body).Decode(&body)
 		assert.NoError(t, err)
 
@@ -87,8 +87,8 @@ func TestPostLinks(t *testing.T) {
 	assert.NoError(t, err)
 }
 
-func TestDeleteLinks(t *testing.T) {
-	reqBody := api.RemoveLinkRequest{
+func Test_DeleteLinks(t *testing.T) {
+	reqBody := scrappertypes.RemoveLinkRequest{
 		Link: aws.String("https://example.com"),
 	}
 
@@ -102,7 +102,7 @@ func TestDeleteLinks(t *testing.T) {
 		assert.Equal(t, r.Header.Get("Content-Type"), "application/json")
 		assert.Equal(t, r.Header.Get("Accept"), "application/json")
 
-		var body api.RemoveLinkRequest
+		var body scrappertypes.RemoveLinkRequest
 		err := json.NewDecoder(r.Body).Decode(&body)
 		assert.NoError(t, err)
 
@@ -118,9 +118,9 @@ func TestDeleteLinks(t *testing.T) {
 	assert.NoError(t, err)
 }
 
-func TestGetLinks(t *testing.T) {
-	response := api.ListLinksResponse{
-		Links: &[]api.LinkResponse{
+func Test_GetLinks(t *testing.T) {
+	response := scrappertypes.ListLinksResponse{
+		Links: &[]scrappertypes.LinkResponse{
 			{
 				Url:     aws.String("https://example.com"),
 				Tags:    &[]string{"tag"},

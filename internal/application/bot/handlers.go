@@ -14,45 +14,7 @@ import (
 	"github.com/AFK068/bot/internal/domain/apperrors"
 	"github.com/AFK068/bot/pkg/utils"
 
-	api "github.com/AFK068/bot/internal/api/openapi/scrapper/v1"
-)
-
-const (
-	StartCommand            = "start"
-	StartCommandDescription = "Start command"
-
-	HelpCommand            = "help"
-	HelpCommandDescription = "List available commands"
-
-	TrackCommand            = "track"
-	TrackCommandDescription = "Start tracking a link"
-
-	UntrackCommand            = "untrack"
-	UntrackCommandDescription = "Stop tracking a link"
-
-	ListCommand            = "list"
-	ListCommandDescription = "Show list of tracked links"
-
-	SkipOption = "Skip"
-)
-
-var (
-	mainKeyboard = tgbotapi.NewReplyKeyboard(
-		tgbotapi.NewKeyboardButtonRow(
-			tgbotapi.NewKeyboardButton("/"+TrackCommand),
-			tgbotapi.NewKeyboardButton("/"+ListCommand),
-		),
-		tgbotapi.NewKeyboardButtonRow(
-			tgbotapi.NewKeyboardButton("/"+HelpCommand),
-			tgbotapi.NewKeyboardButton("/"+UntrackCommand),
-		),
-	)
-
-	skipKeyboard = tgbotapi.NewReplyKeyboard(
-		tgbotapi.NewKeyboardButtonRow(
-			tgbotapi.NewKeyboardButton(SkipOption),
-		),
-	)
+	scrappertypes "github.com/AFK068/bot/internal/api/openapi/scrapper/v1"
 )
 
 func (b *Bot) handleCommand(msg *tgbotapi.Message) {
@@ -84,17 +46,17 @@ func (b *Bot) handleMessage(msg *tgbotapi.Message) {
 	b.Logger.Info("Received message", "chatID", chatID, "text", text)
 
 	conv := b.StateManager.GetConversation(chatID)
-	if conv.FSM.Current() == StateIdle {
+	if conv.FSM.Current() == ConversationStateIdle {
 		b.SendMessage(chatID, "Please enter a command to start. Use /help to see the list of available commands.")
 		return
 	}
 
 	switch conv.FSM.Current() {
-	case StateAwaitingURL:
+	case ConversationStateAwaitingURL:
 		if strings.Contains(text, "github.com") || strings.Contains(text, "stackoverflow.com") {
 			conv.URL = text
 
-			if err := conv.FSM.Event(context.Background(), "set_url"); err != nil {
+			if err := conv.FSM.Event(context.Background(), EventSetURL); err != nil {
 				b.Logger.Error("Error setting URL", "error", err)
 				b.SendMessage(chatID, "Error setting URL. Please try again later.")
 
@@ -106,12 +68,12 @@ func (b *Bot) handleMessage(msg *tgbotapi.Message) {
 			b.SendMessage(chatID, "Invalid link. Please try again:")
 		}
 
-	case StateAwaitingTags:
+	case ConversationStateAwaitingTags:
 		if text != "" && text != SkipOption {
 			conv.Tags = strings.Split(text, " ")
 		}
 
-		if err := conv.FSM.Event(context.Background(), "set_tags"); err != nil {
+		if err := conv.FSM.Event(context.Background(), EventSetTags); err != nil {
 			b.Logger.Error("Error setting tags", "error", err)
 			b.SendMessage(chatID, "Error setting tags. Please try again later.")
 
@@ -120,12 +82,12 @@ func (b *Bot) handleMessage(msg *tgbotapi.Message) {
 
 		b.SendMessage(chatID, "Enter filters separated by spaces (optional):", skipKeyboard)
 
-	case StateAwaitingFilter:
+	case ConversationStateAwaitingFilter:
 		if text != "" && text != SkipOption {
 			conv.Filters = strings.Split(text, " ")
 		}
 
-		err := b.ScrapperClient.PostLinks(context.Background(), chatID, api.AddLinkRequest{
+		err := b.ScrapperClient.PostLinks(context.Background(), chatID, scrappertypes.AddLinkRequest{
 			Link:    aws.String(conv.URL),
 			Tags:    utils.SliceStringPtr(conv.Tags),
 			Filters: utils.SliceStringPtr(conv.Filters),
@@ -138,7 +100,7 @@ func (b *Bot) handleMessage(msg *tgbotapi.Message) {
 			b.SendMessage(chatID, "Link successfully added!", mainKeyboard)
 		}
 
-		if err := conv.FSM.Event(context.Background(), "complete"); err != nil {
+		if err := conv.FSM.Event(context.Background(), EventComplete); err != nil {
 			b.Logger.Error("Error completing tracking", "error", err)
 			b.SendMessage(chatID, "Error completing tracking. Please try again later.", mainKeyboard)
 		}
@@ -150,7 +112,7 @@ func (b *Bot) handleMessage(msg *tgbotapi.Message) {
 func (b *Bot) startTrackConversation(chatID int64) {
 	conv := b.StateManager.GetConversation(chatID)
 
-	if err := conv.FSM.Event(context.Background(), "start_track"); err != nil {
+	if err := conv.FSM.Event(context.Background(), EventStartTrack); err != nil {
 		b.Logger.Error("Error starting tracking", "error", err)
 		b.SendMessage(chatID, "Error starting tracking. Please try again later.")
 
@@ -166,7 +128,7 @@ func (b *Bot) handleUntrack(chatID int64, link string) {
 		return
 	}
 
-	if err := b.ScrapperClient.DeleteLinks(context.Background(), chatID, api.RemoveLinkRequest{
+	if err := b.ScrapperClient.DeleteLinks(context.Background(), chatID, scrappertypes.RemoveLinkRequest{
 		Link: aws.String(link),
 	}); err != nil {
 		b.Logger.Error("Error deleting link", "error", err)

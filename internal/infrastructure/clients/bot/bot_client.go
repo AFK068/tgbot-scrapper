@@ -11,11 +11,11 @@ import (
 
 	"github.com/AFK068/bot/internal/infrastructure/logger"
 
-	api "github.com/AFK068/bot/internal/api/openapi/bot/v1"
+	bottypes "github.com/AFK068/bot/internal/api/openapi/bot/v1"
 )
 
 type Service interface {
-	PostUpdates(ctx context.Context, update api.LinkUpdate) error
+	PostUpdates(ctx context.Context, update bottypes.LinkUpdate) error
 }
 
 type Client struct {
@@ -32,7 +32,7 @@ func NewClient(url string, log *logger.Logger) *Client {
 	}
 }
 
-func (c *Client) PostUpdates(ctx context.Context, update api.LinkUpdate) error {
+func (c *Client) PostUpdates(ctx context.Context, update bottypes.LinkUpdate) error {
 	url := fmt.Sprintf("%s/updates", c.BaseURL)
 
 	c.Logger.Info("Sending update to URL: ", "url", url)
@@ -55,7 +55,7 @@ func (c *Client) PostUpdates(ctx context.Context, update api.LinkUpdate) error {
 		c.Logger.Info("Update posted successfully")
 		return nil
 	case http.StatusBadRequest:
-		var apiErr api.ApiErrorResponse
+		var apiErr bottypes.ApiErrorResponse
 		if err := json.Unmarshal(resp.Body(), &apiErr); err != nil {
 			c.Logger.Error("Failed to decode error response: ", "error", err)
 			return fmt.Errorf("failed to decode error response: %w", err)

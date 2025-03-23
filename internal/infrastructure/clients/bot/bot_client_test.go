@@ -13,11 +13,11 @@ import (
 	"github.com/AFK068/bot/internal/infrastructure/clients/bot"
 	"github.com/AFK068/bot/internal/infrastructure/logger"
 
-	api "github.com/AFK068/bot/internal/api/openapi/bot/v1"
+	bottypes "github.com/AFK068/bot/internal/api/openapi/bot/v1"
 )
 
-func TestPostUpdates(t *testing.T) {
-	reqBody := api.LinkUpdate{
+func Test_PostUpdates(t *testing.T) {
+	reqBody := bottypes.LinkUpdate{
 		Url:         aws.String("https://example.com"),
 		TgChatIds:   &[]int64{1, 2, 3},
 		Description: aws.String("description"),
@@ -32,7 +32,7 @@ func TestPostUpdates(t *testing.T) {
 		assert.Equal(t, r.Header.Get("Content-Type"), "application/json")
 		assert.Equal(t, r.Header.Get("Accept"), "application/json")
 
-		var body api.LinkUpdate
+		var body bottypes.LinkUpdate
 		err := json.NewDecoder(r.Body).Decode(&body)
 		assert.NoError(t, err)
 

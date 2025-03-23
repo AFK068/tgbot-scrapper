@@ -1,4 +1,4 @@
-package handler
+package botapi
 
 import (
 	"fmt"
@@ -8,7 +8,7 @@ import (
 	"github.com/AFK068/bot/internal/application/bot"
 	"github.com/AFK068/bot/internal/infrastructure/logger"
 
-	botapi "github.com/AFK068/bot/internal/api/openapi/bot/v1"
+	bottypes "github.com/AFK068/bot/internal/api/openapi/bot/v1"
 )
 
 type BotHandler struct {
@@ -24,7 +24,7 @@ func NewBotHandler(b bot.Service, l *logger.Logger) *BotHandler {
 }
 
 func (h *BotHandler) PostUpdates(ctx echo.Context) error {
-	var linkUpdate botapi.LinkUpdate
+	var linkUpdate bottypes.LinkUpdate
 	if err := ctx.Bind(&linkUpdate); err != nil {
 		h.Logger.Error("Failed to bind request body", "error", err)
 		return SendBadRequestResponse(ctx, ErrInvalidRequestBody, ErrDescriptionInvalidBody)
