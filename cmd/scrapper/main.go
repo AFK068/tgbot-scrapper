@@ -7,13 +7,12 @@ import (
 	"github.com/AFK068/bot/internal/application/scrapper"
 	"github.com/AFK068/bot/internal/domain"
 	"github.com/AFK068/bot/internal/infrastructure/clients/bot"
+	"github.com/AFK068/bot/internal/infrastructure/httpapi/scrapperapi"
 	"github.com/AFK068/bot/internal/infrastructure/logger"
 	"github.com/AFK068/bot/internal/infrastructure/repository"
 	"github.com/AFK068/bot/internal/infrastructure/server"
 	"github.com/AFK068/bot/pkg/client/github"
 	"github.com/AFK068/bot/pkg/client/stackoverflow"
-
-	handler "github.com/AFK068/bot/internal/infrastructure/handler/scrapper"
 )
 
 const (
@@ -43,7 +42,7 @@ func main() {
 			),
 
 			// Provide scrapper handler.
-			handler.NewScrapperHandler,
+			scrapperapi.NewScrapperHandler,
 
 			// Provide stackoverflow client.
 			fx.Annotate(
@@ -70,8 +69,8 @@ func main() {
 		),
 		fx.Invoke(
 			// Run scrapper.
-			func(s *server.ScrapperServer) error {
-				return s.Start()
+			func(s *server.ScrapperServer, lc fx.Lifecycle, log *logger.Logger) {
+				s.RegisterHooks(lc, log)
 			},
 		),
 	).Run()
