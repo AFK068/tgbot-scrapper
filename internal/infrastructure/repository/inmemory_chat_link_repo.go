@@ -9,14 +9,18 @@ import (
 	"github.com/AFK068/bot/internal/domain/apperrors"
 )
 
+type timeGetter func() time.Time
+
 type InMemoryChatLinkRepository struct {
-	Links map[int64]map[string]*domain.Link
-	mu    sync.RWMutex
+	TimeGetter timeGetter
+	Links      map[int64]map[string]*domain.Link
+	mu         sync.RWMutex
 }
 
 func NewInMemoryLinkRepository() *InMemoryChatLinkRepository {
 	return &InMemoryChatLinkRepository{
-		Links: make(map[int64]map[string]*domain.Link),
+		Links:      make(map[int64]map[string]*domain.Link),
+		TimeGetter: time.Now,
 	}
 }
 
@@ -30,9 +34,7 @@ func (r *InMemoryChatLinkRepository) RegisterChat(_ context.Context, uid int64) 
 		}
 	}
 
-	if _, ok := r.Links[uid]; !ok {
-		r.Links[uid] = make(map[string]*domain.Link)
-	}
+	r.Links[uid] = make(map[string]*domain.Link)
 
 	return nil
 }
@@ -42,7 +44,7 @@ func (r *InMemoryChatLinkRepository) SaveLink(_ context.Context, uid int64, link
 	defer r.mu.Unlock()
 
 	if _, ok := r.Links[uid]; !ok {
-		r.Links[uid] = make(map[string]*domain.Link)
+		return &apperrors.ChatIsNotExistError{Message: "Chat is not exist"}
 	}
 
 	r.Links[uid][link.URL] = link
@@ -53,6 +55,10 @@ func (r *InMemoryChatLinkRepository) SaveLink(_ context.Context, uid int64, link
 func (r *InMemoryChatLinkRepository) DeleteChat(_ context.Context, uid int64) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
+
+	if _, ok := r.Links[uid]; !ok {
+		return &apperrors.ChatIsNotExistError{Message: "Chat is not exist"}
+	}
 
 	delete(r.Links, uid)
 
@@ -122,7 +128,7 @@ func (r *InMemoryChatLinkRepository) UpdateLastCheck(_ context.Context, link *do
 		}
 	}
 
-	r.Links[link.UserAddID][link.URL].LastCheck = time.Now()
+	r.Links[link.UserAddID][link.URL].LastCheck = r.TimeGetter()
 
 	return nil
 }
