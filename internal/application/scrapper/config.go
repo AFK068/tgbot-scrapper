@@ -1,4 +1,4 @@
-package config
+package scrapper
 
 import (
 	"fmt"
@@ -11,13 +11,13 @@ const (
 	ConfigScrapperType = "env"
 )
 
-type ScrapperConfig struct {
+type Config struct {
 	Host   string `mapstructure:"SERVER_HOST"`
 	Port   string `mapstructure:"SERVER_PORT"`
 	BotURL string `mapstructure:"BOT_URL"`
 }
 
-func NewScrapperServerConfig(file string) (*ScrapperConfig, error) {
+func NewConfig(file string) (*Config, error) {
 	viper.AddConfigPath(file)
 	viper.SetConfigName(ConfigScrapperName)
 	viper.SetConfigType(ConfigScrapperType)
@@ -28,7 +28,7 @@ func NewScrapperServerConfig(file string) (*ScrapperConfig, error) {
 		return nil, fmt.Errorf("reading config file: %w", err)
 	}
 
-	config := &ScrapperConfig{}
+	config := &Config{}
 	if err := viper.Unmarshal(config); err != nil {
 		return nil, fmt.Errorf("unmarshaling server config: %w", err)
 	}

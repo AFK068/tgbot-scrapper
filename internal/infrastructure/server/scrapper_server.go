@@ -8,7 +8,6 @@ import (
 	"github.com/labstack/echo/v4"
 	"go.uber.org/fx"
 
-	"github.com/AFK068/bot/config"
 	"github.com/AFK068/bot/internal/application/scrapper"
 	"github.com/AFK068/bot/internal/domain"
 	"github.com/AFK068/bot/internal/infrastructure/httpapi/scrapperapi"
@@ -19,7 +18,7 @@ import (
 )
 
 type ScrapperServer struct {
-	Config    *config.ScrapperConfig
+	Config    *scrapper.Config
 	Handler   *scrapperapi.ScrapperHandler
 	Scheduler *scrapper.Scrapper
 	Echo      *echo.Echo
@@ -28,7 +27,7 @@ type ScrapperServer struct {
 }
 
 func NewScrapperServer(
-	cfg *config.ScrapperConfig,
+	cfg *scrapper.Config,
 	repo domain.ChatLinkRepository,
 	hd *scrapperapi.ScrapperHandler,
 	sd *scrapper.Scrapper,
