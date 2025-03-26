@@ -1,4 +1,4 @@
-package repository_test
+package inmemoryrepo_test
 
 import (
 	"context"
@@ -9,7 +9,7 @@ import (
 
 	"github.com/AFK068/bot/internal/domain"
 	"github.com/AFK068/bot/internal/domain/apperrors"
-	"github.com/AFK068/bot/internal/infrastructure/repository"
+	repository "github.com/AFK068/bot/internal/infrastructure/repository/inmemoryrepo"
 )
 
 func Test_RegisterChat(t *testing.T) {

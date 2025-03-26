@@ -9,7 +9,7 @@ import (
 	"github.com/AFK068/bot/internal/infrastructure/clients/bot"
 	"github.com/AFK068/bot/internal/infrastructure/httpapi/scrapperapi"
 	"github.com/AFK068/bot/internal/infrastructure/logger"
-	"github.com/AFK068/bot/internal/infrastructure/repository"
+	"github.com/AFK068/bot/internal/infrastructure/repository/inmemoryrepo"
 	"github.com/AFK068/bot/internal/infrastructure/server"
 	"github.com/AFK068/bot/pkg/client/github"
 	"github.com/AFK068/bot/pkg/client/stackoverflow"
@@ -37,7 +37,7 @@ func main() {
 
 			// Provide in-memory link repository.
 			fx.Annotate(
-				repository.NewInMemoryLinkRepository,
+				inmemoryrepo.NewInMemoryLinkRepository,
 				fx.As(new(domain.ChatLinkRepository)),
 			),
 
