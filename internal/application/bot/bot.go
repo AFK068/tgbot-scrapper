@@ -6,7 +6,6 @@ import (
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 
-	"github.com/AFK068/bot/config"
 	"github.com/AFK068/bot/internal/infrastructure/clients/scrapper"
 	"github.com/AFK068/bot/internal/infrastructure/logger"
 )
@@ -18,13 +17,13 @@ type Service interface {
 
 type Bot struct {
 	API            *tgbotapi.BotAPI
-	Config         *config.BotConfig
+	Config         *Config
 	ScrapperClient *scrapper.Client
 	StateManager   *StateManager
 	Logger         *logger.Logger
 }
 
-func NewBot(log *logger.Logger, cfg *config.BotConfig, sc *scrapper.Client) *Bot {
+func NewBot(log *logger.Logger, cfg *Config, sc *scrapper.Client) *Bot {
 	return &Bot{
 		Logger:         log,
 		Config:         cfg,

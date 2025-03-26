@@ -8,7 +8,6 @@ import (
 	"github.com/labstack/echo/v4"
 	"go.uber.org/fx"
 
-	"github.com/AFK068/bot/config"
 	"github.com/AFK068/bot/internal/application/bot"
 	"github.com/AFK068/bot/internal/infrastructure/logger"
 	"github.com/AFK068/bot/internal/infrastructure/telegram/botapi"
@@ -17,13 +16,13 @@ import (
 )
 
 type BotServer struct {
-	Config  *config.BotConfig
+	Config  *bot.Config
 	Handler *botapi.BotHandler
 	Echo    *echo.Echo
 	Bot     bot.Service
 }
 
-func NewBotServer(cfg *config.BotConfig, b bot.Service, hd *botapi.BotHandler) *BotServer {
+func NewBotServer(cfg *bot.Config, b bot.Service, hd *botapi.BotHandler) *BotServer {
 	return &BotServer{
 		Config:  cfg,
 		Handler: hd,

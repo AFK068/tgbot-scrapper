@@ -1,4 +1,4 @@
-package config
+package bot
 
 import (
 	"fmt"
@@ -11,14 +11,14 @@ const (
 	ConfigBotType = "env"
 )
 
-type BotConfig struct {
+type Config struct {
 	Token       string `mapstructure:"BOT_TOKEN"`
 	Host        string `mapstructure:"SERVER_HOST"`
 	Port        string `mapstructure:"SERVER_PORT"`
 	ScrapperURL string `mapstructure:"SCRAPPER_URL"`
 }
 
-func NewBotConfig(file string) (*BotConfig, error) {
+func NewConfig(file string) (*Config, error) {
 	viper.AddConfigPath(file)
 	viper.SetConfigName(ConfigBotName)
 	viper.SetConfigType(ConfigBotType)
@@ -29,7 +29,7 @@ func NewBotConfig(file string) (*BotConfig, error) {
 		return nil, fmt.Errorf("reading config file: %w", err)
 	}
 
-	config := &BotConfig{}
+	config := &Config{}
 	if err := viper.Unmarshal(config); err != nil {
 		return nil, fmt.Errorf("unmarshaling server config: %w", err)
 	}

@@ -7,7 +7,6 @@ import (
 
 	"go.uber.org/fx"
 
-	"github.com/AFK068/bot/config"
 	"github.com/AFK068/bot/internal/application/bot"
 	"github.com/AFK068/bot/internal/infrastructure/clients/scrapper"
 	"github.com/AFK068/bot/internal/infrastructure/logger"
@@ -26,8 +25,8 @@ func main() {
 			logger.NewLogger,
 
 			// Provide bot config.
-			func() (*config.BotConfig, error) {
-				botCfg, err := config.NewBotConfig(ConfigPath)
+			func() (*bot.Config, error) {
+				botCfg, err := bot.NewConfig(ConfigPath)
 				if err != nil {
 					return nil, err
 				}
@@ -36,7 +35,7 @@ func main() {
 			},
 
 			// Provide scrapper client.
-			func(cfg *config.BotConfig, log *logger.Logger) *scrapper.Client {
+			func(cfg *bot.Config, log *logger.Logger) *scrapper.Client {
 				return scrapper.NewClient(cfg.ScrapperURL, log)
 			},
 

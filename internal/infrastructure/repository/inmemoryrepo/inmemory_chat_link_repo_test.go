@@ -9,6 +9,7 @@ import (
 
 	"github.com/AFK068/bot/internal/domain"
 	"github.com/AFK068/bot/internal/domain/apperrors"
+
 	repository "github.com/AFK068/bot/internal/infrastructure/repository/inmemoryrepo"
 )
 
