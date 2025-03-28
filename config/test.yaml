@@ -5,5 +5,5 @@ storage:
     user: "user"
     password: "password"
 migrations:
-    migrations_path: "../../../../../migrations"
+    migrations_path: "../../../../../migrations/changesets"
     migrations_table_name: "migrations"
