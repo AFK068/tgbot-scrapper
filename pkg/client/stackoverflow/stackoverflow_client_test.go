@@ -46,7 +46,7 @@ func Test_GetRepo_Success(t *testing.T) {
 	question, err := client.GetQuestion(context.Background(), "https://stackoverflow.com/questions/123")
 	assert.NoError(t, err)
 
-	assert.Equal(t, int64(123), question.QuestionID)
+	assert.Equal(t, int64(123), question.ID)
 	assert.Equal(t, expectedTime.Unix(), question.LastActivityDate)
 }
 
@@ -55,4 +55,77 @@ func Test_GetRepo_InvalidLink(t *testing.T) {
 	_, err := client.GetQuestion(context.Background(), "https://bad_link")
 
 	assert.Error(t, err)
+}
+
+func Test_GetActivity_Success(t *testing.T) {
+	answerResponse := map[string]interface{}{
+		"items": []map[string]interface{}{
+			{
+				"answer_id":          1,
+				"body":               "Test answer body",
+				"last_activity_date": 100,
+				"owner": map[string]interface{}{
+					"display_name": "AnswerUser",
+				},
+			},
+		},
+	}
+
+	commentResponse := map[string]interface{}{
+		"items": []map[string]interface{}{
+			{
+				"comment_id":    101,
+				"creation_date": 200,
+				"body":          "Test comment body",
+				"owner": map[string]interface{}{
+					"display_name": "CommentUser",
+				},
+			},
+		},
+	}
+
+	answerBytes, err := json.Marshal(answerResponse)
+	assert.NoError(t, err)
+
+	commentBytes, err := json.Marshal(commentResponse)
+	assert.NoError(t, err)
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case "/questions/123/answers":
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusOK)
+
+			_, err := w.Write(answerBytes)
+			assert.NoError(t, err)
+		case "/questions/123/comments":
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusOK)
+
+			_, err := w.Write(commentBytes)
+			assert.NoError(t, err)
+		default:
+			w.WriteHeader(http.StatusNotFound)
+		}
+	}))
+
+	defer server.Close()
+
+	client := stackoverflow.NewClient()
+	client.BaseURL = server.URL
+
+	question := &stackoverflow.Question{
+		ID:           123,
+		LastEditDate: 40,
+		Body:         "Test question body",
+		Tags:         []string{"go", "api"},
+		Owner:        stackoverflow.Owner{DisplayName: "QuestionUser"},
+	}
+
+	lastCheckTime := time.Unix(50, 0)
+
+	activities, err := client.GetActivity(context.Background(), question, lastCheckTime)
+	assert.NoError(t, err)
+
+	assert.GreaterOrEqual(t, len(activities), 2)
 }
