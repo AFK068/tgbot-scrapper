@@ -24,3 +24,13 @@ go.work.sum
 
 # env file
 *.env
+
+# MacOS
+.DS_Store
+
+# IDEs
+.vscode
+.idea
+
+# Other
+bin
