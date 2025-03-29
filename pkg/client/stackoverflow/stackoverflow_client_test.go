@@ -129,3 +129,99 @@ func Test_GetActivity_Success(t *testing.T) {
 
 	assert.GreaterOrEqual(t, len(activities), 2)
 }
+
+func Test_GetQuestionCommentActivity_Success(t *testing.T) {
+	commentResponse := map[string]interface{}{
+		"items": []map[string]interface{}{
+			{
+				"comment_id":    101,
+				"creation_date": 200,
+				"body":          "Test comment body",
+				"owner": map[string]interface{}{
+					"display_name": "CommentUser",
+				},
+			},
+		},
+	}
+
+	commentBytes, err := json.Marshal(commentResponse)
+	assert.NoError(t, err)
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "/questions/123/comments", r.URL.Path)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		_, err := w.Write(commentBytes)
+		assert.NoError(t, err)
+	}))
+
+	defer server.Close()
+
+	client := stackoverflow.NewClient()
+	client.BaseURL = server.URL
+
+	question := &stackoverflow.Question{
+		ID:   123,
+		Tags: []string{"go", "api"},
+	}
+
+	lastCheckTime := time.Unix(100, 0)
+
+	activities, err := client.GetQuestionCommentActivity(context.Background(), question, lastCheckTime)
+	assert.NoError(t, err)
+	assert.Len(t, activities, 1)
+
+	activity := activities[0]
+	assert.Equal(t, stackoverflow.ActivityTypeComment, activity.Type)
+	assert.Equal(t, "Test comment body", activity.Body)
+	assert.Equal(t, "CommentUser", activity.UserName)
+	assert.Equal(t, []string{"go", "api"}, activity.Tags)
+}
+
+func Test_GetQuestionAnswerActivity_Success(t *testing.T) {
+	answerResponse := map[string]interface{}{
+		"items": []map[string]interface{}{
+			{
+				"answer_id":          1,
+				"body":               "Test answer body",
+				"last_activity_date": 150,
+				"owner": map[string]interface{}{
+					"display_name": "AnswerUser",
+				},
+			},
+		},
+	}
+
+	answerBytes, err := json.Marshal(answerResponse)
+	assert.NoError(t, err)
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "/questions/123/answers", r.URL.Path)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		_, err := w.Write(answerBytes)
+		assert.NoError(t, err)
+	}))
+
+	defer server.Close()
+
+	client := stackoverflow.NewClient()
+	client.BaseURL = server.URL
+
+	question := &stackoverflow.Question{
+		ID:   123,
+		Tags: []string{"go", "api"},
+	}
+
+	lastCheckTime := time.Unix(100, 0)
+
+	activities, err := client.GetQuestionAnswerActivity(context.Background(), question, lastCheckTime)
+	assert.NoError(t, err)
+	assert.Len(t, activities, 1)
+
+	activity := activities[0]
+	assert.Equal(t, stackoverflow.ActivityTypeAnswer, activity.Type)
+	assert.Equal(t, "Test answer body", activity.Body)
+	assert.Equal(t, "AnswerUser", activity.UserName)
+	assert.Equal(t, []string{"go", "api"}, activity.Tags)
+}
