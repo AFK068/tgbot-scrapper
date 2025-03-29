@@ -36,9 +36,11 @@ func (c *Client) GetQuestion(ctx context.Context, questionURL string) (*Question
 
 	url := fmt.Sprintf("%s/questions/%s?site=stackoverflow&filter=withbody", c.BaseURL, questionID)
 
+	var quesionResponseDTO questionResponseDTO
+
 	resp, err := c.Client.R().
 		SetContext(ctx).
-		SetResult(&QuestionResponse{}).
+		SetResult(&quesionResponseDTO).
 		Get(url)
 	if err != nil {
 		return nil, ErrFailedToGetQuestion
@@ -48,7 +50,7 @@ func (c *Client) GetQuestion(ctx context.Context, questionURL string) (*Question
 		return nil, ErrFailedToGetQuestion
 	}
 
-	quesion := resp.Result().(*QuestionResponse)
+	quesion := resp.Result().(*questionResponseDTO)
 	if len(quesion.Items) == 0 {
 		return nil, ErrQuestionNotFound
 	}
@@ -56,7 +58,7 @@ func (c *Client) GetQuestion(ctx context.Context, questionURL string) (*Question
 	// Trim the body of the question to a certain limit.
 	quesion.Items[0].Body = trimBody(quesion.Items[0].Body)
 
-	return quesion.Items[0], nil
+	return quesion.Items[0].toQuestion(), nil
 }
 
 // GetActivity retrieves the activity of a given question since the last check time.
@@ -66,6 +68,8 @@ func (c *Client) GetQuestion(ctx context.Context, questionURL string) (*Question
 func (c *Client) GetActivity(ctx context.Context, question *Question, lastCheckTime time.Time) ([]*Activity, error) {
 	var activities []*Activity
 
+	fmt.Print(question.LastEditDate, lastCheckTime.Unix())
+
 	// Check main question activity.
 	if question.LastEditDate > lastCheckTime.Unix() {
 		activity := NewActivity(
@@ -73,7 +77,7 @@ func (c *Client) GetActivity(ctx context.Context, question *Question, lastCheckT
 			question.LastEditDate,
 			trimBody(question.Body),
 			question.Tags,
-			question.Owner.DisplayName,
+			question.Name,
 		)
 
 		activities = append(activities, activity)
@@ -107,7 +111,7 @@ func (c *Client) GetQuestionCommentActivity(ctx context.Context, question *Quest
 
 	commentURL := fmt.Sprintf("%s/questions/%d/comments?site=stackoverflow&filter=withbody", c.BaseURL, question.ID)
 
-	commentItems, err := getItems[CommentResponse](ctx, c.Client, commentURL)
+	commentItems, err := getItems[commentResponseDTO](ctx, c.Client, commentURL)
 	if err != nil {
 		return nil, err
 	}
@@ -140,7 +144,7 @@ func (c *Client) GetQuestionAnswerActivity(ctx context.Context, question *Questi
 
 	answerURL := fmt.Sprintf("%s/questions/%d/answers?site=stackoverflow&filter=withbody", c.BaseURL, question.ID)
 
-	answerItems, err := getItems[AnswerResponse](ctx, c.Client, answerURL)
+	answerItems, err := getItems[answerResponseDTO](ctx, c.Client, answerURL)
 	if err != nil {
 		return nil, err
 	}

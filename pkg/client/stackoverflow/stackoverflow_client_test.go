@@ -119,7 +119,7 @@ func Test_GetActivity_Success(t *testing.T) {
 		LastEditDate: 40,
 		Body:         "Test question body",
 		Tags:         []string{"go", "api"},
-		Owner:        stackoverflow.Owner{DisplayName: "QuestionUser"},
+		Name:         "QuestionUser",
 	}
 
 	lastCheckTime := time.Unix(50, 0)
