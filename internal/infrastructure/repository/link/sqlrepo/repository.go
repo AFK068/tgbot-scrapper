@@ -251,3 +251,39 @@ func (r *Repository) GetLinksByTag(ctx context.Context, uid int64, tag string) (
 
 	return links, nil
 }
+
+func (r *Repository) GetLinksPagination(ctx context.Context, offset, limit int) ([]*domain.Link, error) {
+	querier := txs.GetQuerier(ctx, r.db)
+
+	query := `
+	SELECT l.url, ul.last_update, ul.filters, ul.tags, ul.tg_user_id
+	FROM user_link ul
+	JOIN links l ON ul.link_id = l.id
+	LIMIT $1 OFFSET $2;
+	`
+
+	rows, err := querier.Query(ctx, query, limit, offset)
+	if err != nil {
+		return nil, fmt.Errorf("getting links pagination: %w", err)
+	}
+
+	defer rows.Close()
+
+	var links []*domain.Link
+
+	for rows.Next() {
+		var link domain.Link
+
+		if err := rows.Scan(&link.URL, &link.LastCheck, &link.Filters, &link.Tags, &link.UserAddID); err != nil {
+			return nil, fmt.Errorf("scanning link: %w", err)
+		}
+
+		links = append(links, &link)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterating over rows: %w", err)
+	}
+
+	return links, nil
+}

@@ -2,6 +2,7 @@ package sqlrepo_test
 
 import (
 	"context"
+	"fmt"
 	"testing"
 	"time"
 
@@ -316,4 +317,48 @@ func Test_GetLinksByTag_Success(t *testing.T) {
 	assert.Equal(t, link.LastCheck, links[0].LastCheck)
 	assert.Equal(t, link.Filters, links[0].Filters)
 	assert.Equal(t, link.Tags, links[0].Tags)
+}
+
+func TestGetLinksPagination_Success(t *testing.T) {
+	repo, _, ctx := setupDB(t)
+
+	uid := int64(12345)
+
+	err := repo.RegisterChat(ctx, uid)
+	assert.NoError(t, err)
+
+	countLinks := 10
+	limit := 2
+
+	for i := 0; i < countLinks; i++ {
+		link := &domain.Link{
+			UserAddID: uid,
+			URL:       fmt.Sprintf("%d", i),
+		}
+
+		err = repo.SaveLink(ctx, uid, link)
+		assert.NoError(t, err)
+	}
+
+	offset := 0
+
+	for offset < countLinks {
+		pagedLinks, err := repo.GetLinksPagination(ctx, offset, limit)
+		assert.NoError(t, err)
+
+		if offset+limit > countLinks {
+			assert.Len(t, pagedLinks, countLinks-offset)
+		} else {
+			assert.Len(t, pagedLinks, limit)
+		}
+
+		for i, link := range pagedLinks {
+			expectedURL := fmt.Sprintf("%d", offset+i)
+
+			assert.Equal(t, uid, link.UserAddID)
+			assert.Equal(t, expectedURL, link.URL)
+		}
+
+		offset += limit
+	}
 }
