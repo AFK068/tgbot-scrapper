@@ -252,7 +252,7 @@ func (r *Repository) GetLinksByTag(ctx context.Context, uid int64, tag string) (
 	return links, nil
 }
 
-func (r *Repository) GetLinksPagination(ctx context.Context, offset, limit int) ([]*domain.Link, error) {
+func (r *Repository) GetLinksPagination(ctx context.Context, offset, limit uint64) ([]*domain.Link, error) {
 	querier := txs.GetQuerier(ctx, r.db)
 
 	query := `

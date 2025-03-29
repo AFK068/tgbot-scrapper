@@ -343,7 +343,7 @@ func TestGetLinksPagination_Success(t *testing.T) {
 	offset := 0
 
 	for offset < countLinks {
-		pagedLinks, err := repo.GetLinksPagination(ctx, offset, limit)
+		pagedLinks, err := repo.GetLinksPagination(ctx, uint64(offset), uint64(limit)) //nolint
 		assert.NoError(t, err)
 
 		if offset+limit > countLinks {
