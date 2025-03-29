@@ -10,7 +10,7 @@ import (
 
 	"github.com/AFK068/bot/internal/domain"
 	"github.com/AFK068/bot/internal/domain/apperrors"
-	"github.com/AFK068/bot/internal/infrastructure/repository/txs"
+	"github.com/AFK068/bot/pkg/txs"
 )
 
 type timeGetter func() time.Time

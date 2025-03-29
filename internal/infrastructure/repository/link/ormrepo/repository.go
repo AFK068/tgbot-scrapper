@@ -12,7 +12,7 @@ import (
 
 	"github.com/AFK068/bot/internal/domain"
 	"github.com/AFK068/bot/internal/domain/apperrors"
-	"github.com/AFK068/bot/internal/infrastructure/repository/txs"
+	"github.com/AFK068/bot/pkg/txs"
 )
 
 // Unfortunately, ORM in Go works very slowly and therefore it is not recommended to use the gorm.
