@@ -164,6 +164,7 @@ func Test_GetListLinks_Success(t *testing.T) {
 	link := &domain.Link{
 		URL:       "https://github.com/AFK068/bot",
 		LastCheck: timeGetter(),
+		Type:      domain.GithubType,
 		Filters:   []string{"filter1", "filter2"},
 		Tags:      []string{"go", "bot"},
 	}
@@ -175,6 +176,7 @@ func Test_GetListLinks_Success(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Len(t, links, 1)
 	assert.Equal(t, link.URL, links[0].URL)
+	assert.Equal(t, link.Type, links[0].Type)
 	assert.Equal(t, link.LastCheck, links[0].LastCheck)
 	assert.Equal(t, link.Filters, links[0].Filters)
 	assert.Equal(t, link.Tags, links[0].Tags)
@@ -302,9 +304,9 @@ func Test_GetLinksByTag_Success(t *testing.T) {
 	link := &domain.Link{
 		UserAddID: uid,
 		URL:       "https://github.com/AFK068/bot",
-
-		Filters: []string{"filter1", "filter2"},
-		Tags:    []string{"go", "bot"},
+		Type:      domain.GithubType,
+		Filters:   []string{"filter1", "filter2"},
+		Tags:      []string{"go", "bot"},
 	}
 
 	err = repo.SaveLink(ctx, uid, link)
@@ -314,6 +316,7 @@ func Test_GetLinksByTag_Success(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Len(t, links, 1)
 	assert.Equal(t, link.URL, links[0].URL)
+	assert.Equal(t, link.Type, links[0].Type)
 	assert.Equal(t, link.LastCheck, links[0].LastCheck)
 	assert.Equal(t, link.Filters, links[0].Filters)
 	assert.Equal(t, link.Tags, links[0].Tags)
@@ -334,6 +337,7 @@ func TestGetLinksPagination_Success(t *testing.T) {
 		link := &domain.Link{
 			UserAddID: uid,
 			URL:       fmt.Sprintf("%d", i),
+			Type:      domain.GithubType,
 		}
 
 		err = repo.SaveLink(ctx, uid, link)
@@ -357,6 +361,7 @@ func TestGetLinksPagination_Success(t *testing.T) {
 
 			assert.Equal(t, uid, link.UserAddID)
 			assert.Equal(t, expectedURL, link.URL)
+			assert.Equal(t, domain.GithubType, link.Type)
 		}
 
 		offset += limit

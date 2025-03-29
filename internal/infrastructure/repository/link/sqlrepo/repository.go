@@ -66,8 +66,9 @@ func (r *Repository) DeleteChat(ctx context.Context, uid int64) error {
 func (r *Repository) SaveLink(ctx context.Context, uid int64, link *domain.Link) error {
 	querier := txs.GetQuerier(ctx, r.db)
 
-	query := `INSERT INTO links (url) VALUES ($1) ON CONFLICT (url) DO NOTHING;`
-	if _, err := querier.Exec(ctx, query, link.URL); err != nil {
+	query := `INSERT INTO links (url, type) VALUES ($1, $2) ON CONFLICT (url) DO NOTHING;`
+
+	if _, err := querier.Exec(ctx, query, link.URL, link.Type); err != nil {
 		return fmt.Errorf("inserting link: %w", err)
 	}
 
@@ -111,7 +112,7 @@ func (r *Repository) GetListLinks(ctx context.Context, uid int64) ([]*domain.Lin
 	querier := txs.GetQuerier(ctx, r.db)
 
 	query := `
-	SELECT l.url, ul.last_update, ul.filters, ul.tags, ul.tg_user_id
+	SELECT l.url, l.type, ul.last_update, ul.filters, ul.tags, ul.tg_user_id
 	FROM user_link ul
 	JOIN links l ON ul.link_id = l.id
 	WHERE ul.tg_user_id = $1;
@@ -129,7 +130,7 @@ func (r *Repository) GetListLinks(ctx context.Context, uid int64) ([]*domain.Lin
 	for rows.Next() {
 		var link domain.Link
 
-		if err := rows.Scan(&link.URL, &link.LastCheck, &link.Filters, &link.Tags, &link.UserAddID); err != nil {
+		if err := rows.Scan(&link.URL, &link.Type, &link.LastCheck, &link.Filters, &link.Tags, &link.UserAddID); err != nil {
 			return nil, fmt.Errorf("scanning link: %w", err)
 		}
 
@@ -220,7 +221,7 @@ func (r *Repository) GetLinksByTag(ctx context.Context, uid int64, tag string) (
 	querier := txs.GetQuerier(ctx, r.db)
 
 	query := ` 
-	SELECT l.url, ul.last_update, ul.filters, ul.tags, ul.tg_user_id
+	SELECT l.url, l.type, ul.last_update, ul.filters, ul.tags, ul.tg_user_id
 	FROM user_link ul
 	JOIN links l ON ul.link_id = l.id
 	WHERE tg_user_id = $1 AND $2 = ANY(ul.tags);
@@ -238,7 +239,7 @@ func (r *Repository) GetLinksByTag(ctx context.Context, uid int64, tag string) (
 	for rows.Next() {
 		var link domain.Link
 
-		if err := rows.Scan(&link.URL, &link.LastCheck, &link.Filters, &link.Tags, &link.UserAddID); err != nil {
+		if err := rows.Scan(&link.URL, &link.Type, &link.LastCheck, &link.Filters, &link.Tags, &link.UserAddID); err != nil {
 			return nil, fmt.Errorf("scanning link: %w", err)
 		}
 
@@ -256,7 +257,7 @@ func (r *Repository) GetLinksPagination(ctx context.Context, offset, limit uint6
 	querier := txs.GetQuerier(ctx, r.db)
 
 	query := `
-	SELECT l.url, ul.last_update, ul.filters, ul.tags, ul.tg_user_id
+	SELECT l.url, l.type, ul.last_update, ul.filters, ul.tags, ul.tg_user_id
 	FROM user_link ul
 	JOIN links l ON ul.link_id = l.id
 	LIMIT $1 OFFSET $2;
@@ -274,7 +275,7 @@ func (r *Repository) GetLinksPagination(ctx context.Context, offset, limit uint6
 	for rows.Next() {
 		var link domain.Link
 
-		if err := rows.Scan(&link.URL, &link.LastCheck, &link.Filters, &link.Tags, &link.UserAddID); err != nil {
+		if err := rows.Scan(&link.URL, &link.Type, &link.LastCheck, &link.Filters, &link.Tags, &link.UserAddID); err != nil {
 			return nil, fmt.Errorf("scanning link: %w", err)
 		}
 

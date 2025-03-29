@@ -88,8 +88,8 @@ func (r *Repository) SaveLink(ctx context.Context, uid int64, link *domain.Link)
 	querier := txs.GetQuerier(ctx, r.db)
 
 	query, args, err := squirrel.Insert("links").
-		Columns("url").
-		Values(link.URL).
+		Columns("url", "type").
+		Values(link.URL, link.Type).
 		Suffix("ON CONFLICT (url) DO NOTHING").
 		PlaceholderFormat(squirrel.Dollar).
 		ToSql()
@@ -159,7 +159,7 @@ func (r *Repository) DeleteLink(ctx context.Context, uid int64, link *domain.Lin
 func (r *Repository) GetListLinks(ctx context.Context, uid int64) ([]*domain.Link, error) {
 	querier := txs.GetQuerier(ctx, r.db)
 
-	query, args, err := squirrel.Select("l.url", "ul.last_update", "ul.filters", "ul.tags", "ul.tg_user_id").
+	query, args, err := squirrel.Select("l.url", "l.type", "ul.last_update", "ul.filters", "ul.tags", "ul.tg_user_id").
 		From("user_link ul").
 		Join("links l ON ul.link_id = l.id").
 		Where(squirrel.Eq{"ul.tg_user_id": uid}).
@@ -181,7 +181,7 @@ func (r *Repository) GetListLinks(ctx context.Context, uid int64) ([]*domain.Lin
 	for rows.Next() {
 		var link domain.Link
 
-		if err := rows.Scan(&link.URL, &link.LastCheck, &link.Filters, &link.Tags, &link.UserAddID); err != nil {
+		if err := rows.Scan(&link.URL, &link.Type, &link.LastCheck, &link.Filters, &link.Tags, &link.UserAddID); err != nil {
 			return nil, fmt.Errorf("scanning link: %w", err)
 		}
 
@@ -292,7 +292,7 @@ func (r *Repository) UpdateLastCheck(ctx context.Context, link *domain.Link) err
 func (r *Repository) GetLinksByTag(ctx context.Context, uid int64, tag string) ([]*domain.Link, error) {
 	querier := txs.GetQuerier(ctx, r.db)
 
-	query, args, err := squirrel.Select("l.url", "ul.last_update", "ul.filters", "ul.tags", "ul.tg_user_id").
+	query, args, err := squirrel.Select("l.url", "l.type", "ul.last_update", "ul.filters", "ul.tags", "ul.tg_user_id").
 		From("user_link ul").
 		Join("links l ON ul.link_id = l.id").
 		Where(squirrel.Eq{"tg_user_id": uid}).
@@ -315,7 +315,7 @@ func (r *Repository) GetLinksByTag(ctx context.Context, uid int64, tag string) (
 	for rows.Next() {
 		var link domain.Link
 
-		if err := rows.Scan(&link.URL, &link.LastCheck, &link.Filters, &link.Tags, &link.UserAddID); err != nil {
+		if err := rows.Scan(&link.URL, &link.Type, &link.LastCheck, &link.Filters, &link.Tags, &link.UserAddID); err != nil {
 			return nil, fmt.Errorf("scanning link: %w", err)
 		}
 
@@ -332,7 +332,7 @@ func (r *Repository) GetLinksByTag(ctx context.Context, uid int64, tag string) (
 func (r *Repository) GetLinksPagination(ctx context.Context, offset, limit uint64) ([]*domain.Link, error) {
 	querier := txs.GetQuerier(ctx, r.db)
 
-	query, args, err := squirrel.Select("l.url", "ul.last_update", "ul.filters", "ul.tags", "ul.tg_user_id").
+	query, args, err := squirrel.Select("l.url", "l.type", "ul.last_update", "ul.filters", "ul.tags", "ul.tg_user_id").
 		From("user_link ul").
 		Join("links l ON ul.link_id = l.id").
 		Limit(limit).
@@ -355,7 +355,7 @@ func (r *Repository) GetLinksPagination(ctx context.Context, offset, limit uint6
 	for rows.Next() {
 		var link domain.Link
 
-		if err := rows.Scan(&link.URL, &link.LastCheck, &link.Filters, &link.Tags, &link.UserAddID); err != nil {
+		if err := rows.Scan(&link.URL, &link.Type, &link.LastCheck, &link.Filters, &link.Tags, &link.UserAddID); err != nil {
 			return nil, fmt.Errorf("scanning link: %w", err)
 		}
 
