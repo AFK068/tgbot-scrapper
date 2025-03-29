@@ -1,4 +1,4 @@
-openapi: 3.1.0
+openapi: 3.0.0
 info:
   title: Bot API
   version: 1.0.0
@@ -52,6 +52,21 @@ components:
           format: uri
         description:
           type: string
+        сreatedAt:
+          type: string
+          format: date-time
+        UserName:
+          type: string
+        Type:
+          type: string
+          enum:
+            - stackoverflow_comment
+            - stackoverflow_answer
+            - stackoverflow_question
+            - github_repository
+            - github_issue
+            - github_pull_request
+            
         tgChatIds:
           type: array
           items:

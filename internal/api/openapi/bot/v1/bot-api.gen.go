@@ -4,7 +4,19 @@
 package v1
 
 import (
+	"time"
+
 	"github.com/labstack/echo/v4"
+)
+
+// Defines values for LinkUpdateType.
+const (
+	GithubIssue           LinkUpdateType = "github_issue"
+	GithubPullRequest     LinkUpdateType = "github_pull_request"
+	GithubRepository      LinkUpdateType = "github_repository"
+	StackoverflowAnswer   LinkUpdateType = "stackoverflow_answer"
+	StackoverflowComment  LinkUpdateType = "stackoverflow_comment"
+	StackoverflowQuestion LinkUpdateType = "stackoverflow_question"
 )
 
 // ApiErrorResponse defines model for ApiErrorResponse.
@@ -18,11 +30,17 @@ type ApiErrorResponse struct {
 
 // LinkUpdate defines model for LinkUpdate.
 type LinkUpdate struct {
-	Description *string  `json:"description,omitempty"`
-	Id          *int64   `json:"id,omitempty"`
-	TgChatIds   *[]int64 `json:"tgChatIds,omitempty"`
-	Url         *string  `json:"url,omitempty"`
+	Type        *LinkUpdateType `json:"Type,omitempty"`
+	UserName    *string         `json:"UserName,omitempty"`
+	Description *string         `json:"description,omitempty"`
+	Id          *int64          `json:"id,omitempty"`
+	TgChatIds   *[]int64        `json:"tgChatIds,omitempty"`
+	Url         *string         `json:"url,omitempty"`
+	СreatedAt   *time.Time      `json:"сreatedAt,omitempty"`
 }
+
+// LinkUpdateType defines model for LinkUpdate.Type.
+type LinkUpdateType string
 
 // PostUpdatesJSONRequestBody defines body for PostUpdates for application/json ContentType.
 type PostUpdatesJSONRequestBody = LinkUpdate
