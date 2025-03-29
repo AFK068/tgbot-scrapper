@@ -41,13 +41,25 @@ func (h *BotHandler) PostUpdates(ctx echo.Context) error {
 	}
 
 	for _, tgChatID := range *linkUpdate.TgChatIds {
+		message := fmt.Sprintf("Link updated: %s", *linkUpdate.Url)
 		if linkUpdate.Description != nil && *linkUpdate.Description != "" {
-			h.Logger.Info("Sending message with description", "tgChatID", tgChatID, "url", *linkUpdate.Url, "description", *linkUpdate.Description)
-			h.Bot.SendMessage(tgChatID, fmt.Sprintf("Link updated: %s\nDescription: %s", *linkUpdate.Url, *linkUpdate.Description))
-		} else {
-			h.Logger.Info("Sending message without description", "tgChatID", tgChatID, "url", *linkUpdate.Url)
-			h.Bot.SendMessage(tgChatID, fmt.Sprintf("Link updated: %s", *linkUpdate.Url))
+			message = fmt.Sprintf("%s\nDescription: %s", message, *linkUpdate.Description)
 		}
+
+		if linkUpdate.UserName != nil && *linkUpdate.UserName != "" {
+			message = fmt.Sprintf("%s\nUpdated by: %s", message, *linkUpdate.UserName)
+		}
+
+		if linkUpdate.Type != nil {
+			message = fmt.Sprintf("%s\nType: %s", message, *linkUpdate.Type)
+		}
+
+		if linkUpdate.СreatedAt != nil {
+			message = fmt.Sprintf("%s\nCreated at: %s", message, linkUpdate.СreatedAt.Format("2006-01-02 15:04:05"))
+		}
+
+		h.Logger.Info("Sending message", "tgChatID", tgChatID, "message", message)
+		h.Bot.SendMessage(tgChatID, message)
 	}
 
 	h.Logger.Info("Successfully processed PostUpdates request")

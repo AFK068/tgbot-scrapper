@@ -10,6 +10,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/AFK068/bot/internal/infrastructure/logger"
 	"github.com/AFK068/bot/internal/infrastructure/telegram/botapi"
@@ -164,4 +165,31 @@ func Test_PostUpdates_EmptyURL(t *testing.T) {
 			assert.Equal(t, http.StatusBadRequest, rec.Code)
 		})
 	}
+}
+
+func Test_PostUpdates_EmptyDescription(t *testing.T) {
+	botMock := botmocks.NewService(t)
+	h := botapi.NewBotHandler(botMock, logger.NewDiscardLogger())
+
+	botMock.On("SendMessage", int64(123), "Link updated: https://test").Once()
+
+	reqBody := bottypes.LinkUpdate{
+		TgChatIds: &[]int64{123},
+		Url:       aws.String("https://test"),
+	}
+
+	reqBodyBytes, err := json.Marshal(reqBody)
+	require.NoError(t, err)
+
+	req := httptest.NewRequest(http.MethodPost, "/updates", bytes.NewReader(reqBodyBytes))
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+
+	rec := httptest.NewRecorder()
+	c := echo.New().NewContext(req, rec)
+
+	err = h.PostUpdates(c)
+	assert.NoError(t, err)
+	assert.Equal(t, http.StatusOK, rec.Code)
+
+	botMock.AssertExpectations(t)
 }
