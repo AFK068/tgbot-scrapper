@@ -4,6 +4,7 @@ CREATE TABLE tg_users (
 
 CREATE TABLE links (
     id BIGSERIAL PRIMARY KEY,
+    type TEXT NOT NULL,
     url TEXT NOT NULL UNIQUE
 );
 
