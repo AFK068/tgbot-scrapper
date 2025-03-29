@@ -174,64 +174,6 @@ func (_c *ChatLinkRepository_DeleteLink_Call) RunAndReturn(run func(context.Cont
 	return _c
 }
 
-// GetAllLinks provides a mock function with given fields: ctx
-func (_m *ChatLinkRepository) GetAllLinks(ctx context.Context) ([]*domain.Link, error) {
-	ret := _m.Called(ctx)
-
-	if len(ret) == 0 {
-		panic("no return value specified for GetAllLinks")
-	}
-
-	var r0 []*domain.Link
-	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context) ([]*domain.Link, error)); ok {
-		return rf(ctx)
-	}
-	if rf, ok := ret.Get(0).(func(context.Context) []*domain.Link); ok {
-		r0 = rf(ctx)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]*domain.Link)
-		}
-	}
-
-	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
-		r1 = rf(ctx)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-// ChatLinkRepository_GetAllLinks_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetAllLinks'
-type ChatLinkRepository_GetAllLinks_Call struct {
-	*mock.Call
-}
-
-// GetAllLinks is a helper method to define mock.On call
-//   - ctx context.Context
-func (_e *ChatLinkRepository_Expecter) GetAllLinks(ctx interface{}) *ChatLinkRepository_GetAllLinks_Call {
-	return &ChatLinkRepository_GetAllLinks_Call{Call: _e.mock.On("GetAllLinks", ctx)}
-}
-
-func (_c *ChatLinkRepository_GetAllLinks_Call) Run(run func(ctx context.Context)) *ChatLinkRepository_GetAllLinks_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context))
-	})
-	return _c
-}
-
-func (_c *ChatLinkRepository_GetAllLinks_Call) Return(_a0 []*domain.Link, _a1 error) *ChatLinkRepository_GetAllLinks_Call {
-	_c.Call.Return(_a0, _a1)
-	return _c
-}
-
-func (_c *ChatLinkRepository_GetAllLinks_Call) RunAndReturn(run func(context.Context) ([]*domain.Link, error)) *ChatLinkRepository_GetAllLinks_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
 // GetChatIDsByLink provides a mock function with given fields: ctx, link
 func (_m *ChatLinkRepository) GetChatIDsByLink(ctx context.Context, link *domain.Link) ([]int64, error) {
 	ret := _m.Called(ctx, link)
@@ -287,6 +229,126 @@ func (_c *ChatLinkRepository_GetChatIDsByLink_Call) Return(_a0 []int64, _a1 erro
 }
 
 func (_c *ChatLinkRepository_GetChatIDsByLink_Call) RunAndReturn(run func(context.Context, *domain.Link) ([]int64, error)) *ChatLinkRepository_GetChatIDsByLink_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetLinksByTag provides a mock function with given fields: ctx, uid, tag
+func (_m *ChatLinkRepository) GetLinksByTag(ctx context.Context, uid int64, tag string) ([]*domain.Link, error) {
+	ret := _m.Called(ctx, uid, tag)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetLinksByTag")
+	}
+
+	var r0 []*domain.Link
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, int64, string) ([]*domain.Link, error)); ok {
+		return rf(ctx, uid, tag)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, int64, string) []*domain.Link); ok {
+		r0 = rf(ctx, uid, tag)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*domain.Link)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, int64, string) error); ok {
+		r1 = rf(ctx, uid, tag)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// ChatLinkRepository_GetLinksByTag_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetLinksByTag'
+type ChatLinkRepository_GetLinksByTag_Call struct {
+	*mock.Call
+}
+
+// GetLinksByTag is a helper method to define mock.On call
+//   - ctx context.Context
+//   - uid int64
+//   - tag string
+func (_e *ChatLinkRepository_Expecter) GetLinksByTag(ctx interface{}, uid interface{}, tag interface{}) *ChatLinkRepository_GetLinksByTag_Call {
+	return &ChatLinkRepository_GetLinksByTag_Call{Call: _e.mock.On("GetLinksByTag", ctx, uid, tag)}
+}
+
+func (_c *ChatLinkRepository_GetLinksByTag_Call) Run(run func(ctx context.Context, uid int64, tag string)) *ChatLinkRepository_GetLinksByTag_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(int64), args[2].(string))
+	})
+	return _c
+}
+
+func (_c *ChatLinkRepository_GetLinksByTag_Call) Return(_a0 []*domain.Link, _a1 error) *ChatLinkRepository_GetLinksByTag_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *ChatLinkRepository_GetLinksByTag_Call) RunAndReturn(run func(context.Context, int64, string) ([]*domain.Link, error)) *ChatLinkRepository_GetLinksByTag_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetLinksPagination provides a mock function with given fields: ctx, offset, limit
+func (_m *ChatLinkRepository) GetLinksPagination(ctx context.Context, offset uint64, limit uint64) ([]*domain.Link, error) {
+	ret := _m.Called(ctx, offset, limit)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetLinksPagination")
+	}
+
+	var r0 []*domain.Link
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, uint64, uint64) ([]*domain.Link, error)); ok {
+		return rf(ctx, offset, limit)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, uint64, uint64) []*domain.Link); ok {
+		r0 = rf(ctx, offset, limit)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*domain.Link)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, uint64, uint64) error); ok {
+		r1 = rf(ctx, offset, limit)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// ChatLinkRepository_GetLinksPagination_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetLinksPagination'
+type ChatLinkRepository_GetLinksPagination_Call struct {
+	*mock.Call
+}
+
+// GetLinksPagination is a helper method to define mock.On call
+//   - ctx context.Context
+//   - offset uint64
+//   - limit uint64
+func (_e *ChatLinkRepository_Expecter) GetLinksPagination(ctx interface{}, offset interface{}, limit interface{}) *ChatLinkRepository_GetLinksPagination_Call {
+	return &ChatLinkRepository_GetLinksPagination_Call{Call: _e.mock.On("GetLinksPagination", ctx, offset, limit)}
+}
+
+func (_c *ChatLinkRepository_GetLinksPagination_Call) Run(run func(ctx context.Context, offset uint64, limit uint64)) *ChatLinkRepository_GetLinksPagination_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uint64), args[2].(uint64))
+	})
+	return _c
+}
+
+func (_c *ChatLinkRepository_GetLinksPagination_Call) Return(_a0 []*domain.Link, _a1 error) *ChatLinkRepository_GetLinksPagination_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *ChatLinkRepository_GetLinksPagination_Call) RunAndReturn(run func(context.Context, uint64, uint64) ([]*domain.Link, error)) *ChatLinkRepository_GetLinksPagination_Call {
 	_c.Call.Return(run)
 	return _c
 }
