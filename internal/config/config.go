@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 
+	"github.com/AFK068/bot/internal/domain"
 	"github.com/ilyakaznacheev/cleanenv"
 )
 
@@ -12,11 +13,12 @@ type Config struct {
 }
 
 type Storage struct {
-	Host         string `yaml:"host" env:"POSTGRES_HOST" env-required:"true"`
-	Port         string `yaml:"port" env:"POSTGRES_PORT" env-required:"true"`
-	DatabaseName string `yaml:"database_name" env:"POSTGRES_DATABASE_NAME" env-required:"true"`
-	User         string `yaml:"user" env:"POSTGRES_USER" env-required:"true"`
-	Password     string `yaml:"password" env:"POSTGRES_PASSWORD" env-required:"true"`
+	Type         domain.RepositoryType `yaml:"type" env:"STORAGE_TYPE" env-required:"true" env-default:"sql"`
+	Host         string                `yaml:"host" env:"POSTGRES_HOST" env-required:"true"`
+	Port         string                `yaml:"port" env:"POSTGRES_PORT" env-required:"true"`
+	DatabaseName string                `yaml:"database_name" env:"POSTGRES_DATABASE_NAME" env-required:"true"`
+	User         string                `yaml:"user" env:"POSTGRES_USER" env-required:"true"`
+	Password     string                `yaml:"password" env:"POSTGRES_PASSWORD" env-required:"true"`
 }
 
 type Migration struct {
@@ -29,6 +31,12 @@ func NewConfig(filePath string) (*Config, error) {
 
 	if err := cleanenv.ReadConfig(filePath, config); err != nil {
 		return nil, err
+	}
+
+	switch config.Storage.Type {
+	case domain.DirectSQLRepository, domain.ORMRepository:
+	default:
+		config.Storage.Type = domain.DirectSQLRepository
 	}
 
 	return config, nil

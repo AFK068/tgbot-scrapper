@@ -2,6 +2,13 @@ package domain
 
 import "context"
 
+type RepositoryType string
+
+const (
+	DirectSQLRepository RepositoryType = "sql"
+	ORMRepository       RepositoryType = "orm"
+)
+
 type ChatLinkRepository interface {
 	// Chat methods.
 	RegisterChat(ctx context.Context, uid int64) error

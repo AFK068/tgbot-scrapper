@@ -1,0 +1,11 @@
+storage:
+    type: sql
+    host: "localhost"
+    port: "5432"
+    database_name: "postgres"
+    user: "user"
+    password: ${POSTGRES_PASSWORD}
+migrations:
+    migrations_path: ../../../../../migrations/changesets
+    migrations_table_name: migrations
+
