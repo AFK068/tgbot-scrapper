@@ -1,0 +1,16 @@
+FROM golang:1.23.2 as builder
+
+ENV GOPATH=/
+WORKDIR /app
+COPY ./ /app
+
+RUN go mod download && CGO_ENABLED=0 go build -o /scrapper ./cmd/scrapper/main.go
+
+FROM alpine:latest
+
+WORKDIR /app
+COPY --from=builder /scrapper /app/scrapper
+COPY ./config/scrapper.yaml /app/config/scrapper.yaml
+COPY ./config/common.yaml /app/config/common.yaml
+
+CMD ["/app/scrapper"]
