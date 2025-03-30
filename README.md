@@ -1,36 +1,28 @@
 ## About
-Telegram bot that allows you to track GitHub repositories and StackOverflow questions for the latest activity
 
-## How to run
+This Telegram bot monitors the latest activity on GitHub repositories, such as issues and pull requests, as well as Stack Overflow questions, including answers and comments.
 
-### Step 1: You need to create .env files in the root of the project
+## Architecture
 
-Create a `bot.env` file with the following content:
+![Architecture Diagram](assets/architecture.png)
 
-```
-BOT_TOKEN=your_bot_token_here
-SCRAPPER_URL=your_scrapper_url_here
-SERVER_HOST=your_server_host_here
-SERVER_PORT=your_server_port_here
-```
-Create a `scrapper.env` file with the following content:
+## How to Run
 
-```
-SERVER_HOST=your_server_host_here
-SERVER_PORT=your_server_port_here
-BOT_URL=your_bot_url_here
-```
+The bot can be launched using **Docker Compose**.
 
-### Step 2: Launch the Bot and Scraper
-
-Use the Makefile to run the projects:
-
-- To run the bot, use the command:
+### Method 1: Using an `.env` File
+1. Create a `.env` file in the root of the project with the following variables:
   ```
-  make run_bot
+  BOT_TOKEN=<your_bot_token>
+  POSTGRES_PASSWORD=<your_database_password>
+  ```
+2. Start the services using Docker Compose:
+  ```
+  docker-compose up -d
   ```
 
-- To run the scraper, use the command:
+### Method 2: Passing Variables via Command Line
+1. Pass the required variables directly in the command line:
   ```
-  make run_scrapper
+  BOT_TOKEN=<your_bot_token> POSTGRES_PASSWORD=<your_database_password> docker-compose up -d
   ```
