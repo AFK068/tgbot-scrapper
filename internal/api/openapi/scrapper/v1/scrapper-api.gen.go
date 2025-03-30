@@ -53,7 +53,8 @@ type DeleteLinksParams struct {
 
 // GetLinksParams defines parameters for GetLinks.
 type GetLinksParams struct {
-	TgChatId int64 `json:"Tg-Chat-Id"`
+	Tag      *string `form:"tag,omitempty" json:"tag,omitempty"`
+	TgChatId int64   `json:"Tg-Chat-Id"`
 }
 
 // PostLinksParams defines parameters for PostLinks.
@@ -128,6 +129,12 @@ func (w *ServerInterfaceWrapper) GetLinks(ctx echo.Context) error {
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params GetLinksParams
+	// ------------- Optional query parameter "tag" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "tag", ctx.QueryParams(), &params.Tag)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter tag: %s", err))
+	}
 
 	headers := ctx.Request().Header
 	// ------------- Required header parameter "Tg-Chat-Id" -------------
