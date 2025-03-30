@@ -16,3 +16,5 @@ packages:
     all: true
   "github.com/AFK068/bot/internal/application/scrapper":
     all: true
+  "github.com/AFK068/bot/internal/infrastructure/httpapi/scrapperapi":
+    all: true
