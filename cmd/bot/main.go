@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	ConfigPath = "."
+	BotConfigPath = "config/bot.yaml"
 )
 
 func main() {
@@ -26,7 +26,7 @@ func main() {
 
 			// Provide bot config.
 			func() (*bot.Config, error) {
-				botCfg, err := bot.NewConfig(ConfigPath)
+				botCfg, err := bot.NewConfig(BotConfigPath)
 				if err != nil {
 					return nil, err
 				}

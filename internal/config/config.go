@@ -3,8 +3,9 @@ package config
 import (
 	"fmt"
 
-	"github.com/AFK068/bot/internal/domain"
 	"github.com/ilyakaznacheev/cleanenv"
+
+	"github.com/AFK068/bot/internal/domain"
 )
 
 type Config struct {
