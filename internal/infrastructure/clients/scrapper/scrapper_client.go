@@ -18,7 +18,7 @@ type Service interface {
 	DeleteTgChatID(ctx context.Context, id int64) error
 	PostLinks(ctx context.Context, tgChatID int64, link scrappertypes.AddLinkRequest) error
 	DeleteLinks(ctx context.Context, tgChatID int64, link scrappertypes.RemoveLinkRequest) error
-	GetLinks(ctx context.Context, tgChatID int64) (scrappertypes.ListLinksResponse, error)
+	GetLinks(ctx context.Context, tgChatID int64, tag ...string) (scrappertypes.ListLinksResponse, error)
 }
 
 type Client struct {
@@ -107,16 +107,21 @@ func (c *Client) DeleteLinks(ctx context.Context, tgChatID int64, link scrappert
 	return c.handleResponse(resp.StatusCode(), resp.Body())
 }
 
-func (c *Client) GetLinks(ctx context.Context, tgChatID int64) (scrappertypes.ListLinksResponse, error) {
+func (c *Client) GetLinks(ctx context.Context, tgChatID int64, tag ...string) (scrappertypes.ListLinksResponse, error) {
 	url := fmt.Sprintf("%s/links", c.BaseURL)
 	c.Logger.Info("Getting Links", "url", url, "tgChatID", tgChatID)
 
-	resp, err := c.Client.R().
+	req := c.Client.R().
 		SetContext(ctx).
 		SetHeader(echo.HeaderContentType, echo.MIMEApplicationJSON).
 		SetHeader(echo.HeaderAccept, echo.MIMEApplicationJSON).
-		SetHeader("Tg-Chat-Id", fmt.Sprintf("%d", tgChatID)).
-		Get(url)
+		SetHeader("Tg-Chat-Id", fmt.Sprintf("%d", tgChatID))
+
+	if len(tag) > 0 && tag[0] != "" {
+		req.SetQueryParam("tag", tag[0])
+	}
+
+	resp, err := req.Get(url)
 	if err != nil {
 		c.Logger.Error("Failed to get Links", "error", err)
 		return scrappertypes.ListLinksResponse{}, fmt.Errorf("failed to do request: %w", err)
