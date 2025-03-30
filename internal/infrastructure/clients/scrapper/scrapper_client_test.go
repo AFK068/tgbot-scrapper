@@ -123,7 +123,7 @@ func Test_GetLinks(t *testing.T) {
 		Links: &[]scrappertypes.LinkResponse{
 			{
 				Url:     aws.String("https://example.com"),
-				Tags:    &[]string{"tag"},
+				Tags:    &[]string{"tag123"},
 				Filters: &[]string{"filter"},
 			},
 		},
@@ -152,6 +152,45 @@ func Test_GetLinks(t *testing.T) {
 
 	client := scrapper.NewClient(server.URL, logger.NewDiscardLogger())
 	resp, err := client.GetLinks(context.Background(), 123)
+	assert.NoError(t, err)
+	assert.Equal(t, response, resp)
+}
+
+func Test_WithTag_GetLinks(t *testing.T) {
+	response := scrappertypes.ListLinksResponse{
+		Links: &[]scrappertypes.LinkResponse{
+			{
+				Url:     aws.String("https://example.com"),
+				Tags:    &[]string{"tag123"},
+				Filters: &[]string{"filter"},
+			},
+		},
+		Size: aws.Int32(1),
+	}
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodGet, r.Method)
+
+		assert.Equal(t, "/links", r.URL.Path)
+
+		assert.Equal(t, r.Header.Get("Tg-Chat-ID"), "123")
+		assert.Equal(t, r.URL.Query().Get("tag"), "tag123")
+
+		assert.Equal(t, r.Header.Get("Content-Type"), "application/json")
+		assert.Equal(t, r.Header.Get("Accept"), "application/json")
+
+		resp, err := json.Marshal(response)
+		assert.NoError(t, err)
+
+		w.WriteHeader(http.StatusOK)
+		_, err = w.Write(resp)
+		assert.NoError(t, err)
+	}))
+
+	defer server.Close()
+
+	client := scrapper.NewClient(server.URL, logger.NewDiscardLogger())
+	resp, err := client.GetLinks(context.Background(), 123, "tag123")
 	assert.NoError(t, err)
 	assert.Equal(t, response, resp)
 }

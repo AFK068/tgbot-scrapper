@@ -118,9 +118,16 @@ func (_c *Service_DeleteTgChatID_Call) RunAndReturn(run func(context.Context, in
 	return _c
 }
 
-// GetLinks provides a mock function with given fields: ctx, tgChatID
-func (_m *Service) GetLinks(ctx context.Context, tgChatID int64) (v1.ListLinksResponse, error) {
-	ret := _m.Called(ctx, tgChatID)
+// GetLinks provides a mock function with given fields: ctx, tgChatID, tag
+func (_m *Service) GetLinks(ctx context.Context, tgChatID int64, tag ...string) (v1.ListLinksResponse, error) {
+	_va := make([]interface{}, len(tag))
+	for _i := range tag {
+		_va[_i] = tag[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, tgChatID)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetLinks")
@@ -128,17 +135,17 @@ func (_m *Service) GetLinks(ctx context.Context, tgChatID int64) (v1.ListLinksRe
 
 	var r0 v1.ListLinksResponse
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, int64) (v1.ListLinksResponse, error)); ok {
-		return rf(ctx, tgChatID)
+	if rf, ok := ret.Get(0).(func(context.Context, int64, ...string) (v1.ListLinksResponse, error)); ok {
+		return rf(ctx, tgChatID, tag...)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, int64) v1.ListLinksResponse); ok {
-		r0 = rf(ctx, tgChatID)
+	if rf, ok := ret.Get(0).(func(context.Context, int64, ...string) v1.ListLinksResponse); ok {
+		r0 = rf(ctx, tgChatID, tag...)
 	} else {
 		r0 = ret.Get(0).(v1.ListLinksResponse)
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, int64) error); ok {
-		r1 = rf(ctx, tgChatID)
+	if rf, ok := ret.Get(1).(func(context.Context, int64, ...string) error); ok {
+		r1 = rf(ctx, tgChatID, tag...)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -154,13 +161,21 @@ type Service_GetLinks_Call struct {
 // GetLinks is a helper method to define mock.On call
 //   - ctx context.Context
 //   - tgChatID int64
-func (_e *Service_Expecter) GetLinks(ctx interface{}, tgChatID interface{}) *Service_GetLinks_Call {
-	return &Service_GetLinks_Call{Call: _e.mock.On("GetLinks", ctx, tgChatID)}
+//   - tag ...string
+func (_e *Service_Expecter) GetLinks(ctx interface{}, tgChatID interface{}, tag ...interface{}) *Service_GetLinks_Call {
+	return &Service_GetLinks_Call{Call: _e.mock.On("GetLinks",
+		append([]interface{}{ctx, tgChatID}, tag...)...)}
 }
 
-func (_c *Service_GetLinks_Call) Run(run func(ctx context.Context, tgChatID int64)) *Service_GetLinks_Call {
+func (_c *Service_GetLinks_Call) Run(run func(ctx context.Context, tgChatID int64, tag ...string)) *Service_GetLinks_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(int64))
+		variadicArgs := make([]string, len(args)-2)
+		for i, a := range args[2:] {
+			if a != nil {
+				variadicArgs[i] = a.(string)
+			}
+		}
+		run(args[0].(context.Context), args[1].(int64), variadicArgs...)
 	})
 	return _c
 }
@@ -170,7 +185,7 @@ func (_c *Service_GetLinks_Call) Return(_a0 v1.ListLinksResponse, _a1 error) *Se
 	return _c
 }
 
-func (_c *Service_GetLinks_Call) RunAndReturn(run func(context.Context, int64) (v1.ListLinksResponse, error)) *Service_GetLinks_Call {
+func (_c *Service_GetLinks_Call) RunAndReturn(run func(context.Context, int64, ...string) (v1.ListLinksResponse, error)) *Service_GetLinks_Call {
 	_c.Call.Return(run)
 	return _c
 }
