@@ -1,6 +1,6 @@
 storage:
     type: sql
-    host: "postgresql"
+    host: "localhost"
     port: "5432"
     database_name: "scrapper"
     user: "postgres"
