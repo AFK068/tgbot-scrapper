@@ -6,16 +6,24 @@ import (
 	"github.com/looplab/fsm"
 )
 
-const (
-	ConversationStateIdle           = "idle"
-	ConversationStateAwaitingURL    = "awaiting_url"
-	ConversationStateAwaitingTags   = "awaiting_tags"
-	ConversationStateAwaitingFilter = "awaiting_filter"
+// Why alias?
+// Because looplab/fsm only works with strings and
+// I think it's bad idea every time to cast to a strings.
 
-	EventStartTrack = "start_track"
-	EventSetURL     = "set_url"
-	EventSetTags    = "set_tags"
-	EventComplete   = "complete"
+type ConversationState = string
+
+type Event = string
+
+const (
+	ConversationStateIdle           ConversationState = "idle"
+	ConversationStateAwaitingURL    ConversationState = "awaiting_url"
+	ConversationStateAwaitingTags   ConversationState = "awaiting_tags"
+	ConversationStateAwaitingFilter ConversationState = "awaiting_filter"
+
+	EventStartTrack Event = "start_track"
+	EventSetURL     Event = "set_url"
+	EventSetTags    Event = "set_tags"
+	EventComplete   Event = "complete"
 
 	EnterState = "enter_state"
 )

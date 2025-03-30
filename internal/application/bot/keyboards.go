@@ -18,7 +18,7 @@ const (
 	UntrackCommandDescription = "Stop tracking a link"
 
 	ListCommand            = "list"
-	ListCommandDescription = "Show list of tracked links"
+	ListCommandDescription = "Show list of tracked links.\nYou can also use /list <tag> to filter by tag"
 
 	SkipOption = "Skip"
 )

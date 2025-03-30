@@ -33,7 +33,7 @@ func (b *Bot) handleCommand(msg *tgbotapi.Message) {
 	case UntrackCommand:
 		b.handleUntrack(chatID, msg.CommandArguments())
 	case ListCommand:
-		b.handleList(chatID)
+		b.handleList(chatID, msg.CommandArguments())
 	default:
 		b.SendMessage(chatID, "Unknown command. Use /help to see the list of available commands.")
 	}
@@ -138,8 +138,15 @@ func (b *Bot) handleUntrack(chatID int64, link string) {
 	}
 }
 
-func (b *Bot) handleList(chatID int64) {
-	links, err := b.ScrapperClient.GetLinks(context.Background(), chatID)
+func (b *Bot) handleList(chatID int64, tag ...string) {
+	links, err := func() (scrappertypes.ListLinksResponse, error) {
+		if len(tag) == 0 {
+			return b.ScrapperClient.GetLinks(context.Background(), chatID)
+		}
+
+		return b.ScrapperClient.GetLinks(context.Background(), chatID, tag[0])
+	}()
+
 	if err != nil {
 		b.Logger.Error("Error getting links", "error", err)
 		b.handleError(chatID, err)
