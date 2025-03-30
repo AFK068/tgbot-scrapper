@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  bot:
+    container_name: bot
+    build:
+      context: .
+      dockerfile: Dockerfile.bot
+    ports:
+      - "8080:8080"
+    environment:
+      - BOT_TOKEN=${BOT_TOKEN}
+    depends_on:
+      - postgresql
+      - scrapper
+    networks:
+      - backend
+
+  scrapper:
+    container_name: scrapper
+    build:
+      context: .
+      dockerfile: Dockerfile.scrapper
+    ports:
+      - "8081:8081"
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    depends_on:
+      - postgresql
+    networks:
+      - backend
+
+  postgresql:
+    container_name: postgresql
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: scrapper
+    ports:
+      - "5432:5432"
+    restart: on-failure
+    networks:
+      - backend
+  liquibase-migrations:
+    container_name: migrations
+    image: liquibase/liquibase:4.29
+    depends_on:
+      - postgresql
+    command:
+      - --searchPath=/changesets
+      - --changelog-file=master.xml
+      - --driver=org.postgresql.Driver
+      - --url=jdbc:postgresql://postgresql:5432/scrapper
+      - --username=postgres
+      - --password=${POSTGRES_PASSWORD}
+      - update
+    volumes:
+      - ./migrations:/changesets
+    networks:
+      - backend
+
+networks:
+  backend:
