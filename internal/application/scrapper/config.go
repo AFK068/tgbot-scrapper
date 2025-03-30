@@ -1,36 +1,18 @@
 package scrapper
 
-import (
-	"fmt"
-
-	"github.com/spf13/viper"
-)
-
-const (
-	ConfigScrapperName = "scrapper"
-	ConfigScrapperType = "env"
-)
+import "github.com/ilyakaznacheev/cleanenv"
 
 type Config struct {
-	Host   string `mapstructure:"SERVER_HOST"`
-	Port   string `mapstructure:"SERVER_PORT"`
-	BotURL string `mapstructure:"BOT_URL"`
+	Host   string `yaml:"host" env:"SCRAPPER_HOST" env-required:"true"`
+	Port   string `yaml:"port" env:"SCRAPPER_PORT" env-required:"true"`
+	BotURL string `yaml:"bot_url" env:"SCRAPPER_BOT_URL" env-required:"true"`
 }
 
 func NewConfig(file string) (*Config, error) {
-	viper.AddConfigPath(file)
-	viper.SetConfigName(ConfigScrapperName)
-	viper.SetConfigType(ConfigScrapperType)
-
-	viper.AutomaticEnv()
-
-	if err := viper.ReadInConfig(); err != nil {
-		return nil, fmt.Errorf("reading config file: %w", err)
-	}
-
 	config := &Config{}
-	if err := viper.Unmarshal(config); err != nil {
-		return nil, fmt.Errorf("unmarshaling server config: %w", err)
+
+	if err := cleanenv.ReadConfig(file, config); err != nil {
+		return nil, err
 	}
 
 	return config, nil

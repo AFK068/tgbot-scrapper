@@ -1,0 +1,3 @@
+host: "localhost"
+port: "8081"
+bot_url: "http://localhost:8080"
