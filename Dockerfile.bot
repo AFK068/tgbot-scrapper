@@ -1,0 +1,15 @@
+FROM golang:1.23.2 as builder
+
+ENV GOPATH=/
+WORKDIR /app
+COPY ./ /app
+
+RUN go mod download && CGO_ENABLED=0 go build -o /bot ./cmd/bot/main.go
+
+FROM alpine:latest
+
+WORKDIR /app
+COPY --from=builder /bot /app/bot
+COPY ./config/bot.yaml /app/config/bot.yaml
+
+CMD ["/app/bot"]
