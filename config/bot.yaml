@@ -1,4 +1,4 @@
 host: "localhost"
 port: "8080"
-scrapper_url: "http://localhost:8081"
+scrapper_url: "http://scrapper:8081"
 token: ${BOT_TOKEN}

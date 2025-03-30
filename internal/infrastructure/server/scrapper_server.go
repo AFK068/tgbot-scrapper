@@ -52,7 +52,7 @@ func (s *ScrapperServer) Start() error {
 	// Run the scrapper.
 	s.Scheduler.Run(scrapper.DefaultJobDuration)
 
-	return s.Echo.Start(s.Config.Host + ":" + s.Config.Port)
+	return s.Echo.Start(":" + s.Config.Port)
 }
 
 func (s *ScrapperServer) Stop() error {

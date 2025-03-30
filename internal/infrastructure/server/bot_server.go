@@ -34,7 +34,7 @@ func NewBotServer(cfg *bot.Config, b bot.Service, hd *botapi.BotHandler) *BotSer
 func (s *BotServer) Start() error {
 	bottypes.RegisterHandlers(s.Echo, s.Handler)
 
-	return s.Echo.Start(s.Config.Host + ":" + s.Config.Port)
+	return s.Echo.Start(":" + s.Config.Port)
 }
 
 func (s *BotServer) Stop() error {
