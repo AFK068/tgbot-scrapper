@@ -1,6 +1,7 @@
 package scrapperapi
 
 import (
+	"context"
 	"errors"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -15,13 +16,22 @@ import (
 	scrappertypes "github.com/AFK068/bot/internal/api/openapi/scrapper/v1"
 )
 
+type Transactor interface {
+	WithTransaction(ctx context.Context, txFunc func(ctx context.Context) error) error
+}
+
 type ScrapperHandler struct {
+	transactor Transactor
 	repository domain.ChatLinkRepository
 	Logger     *logger.Logger
 }
 
-func NewScrapperHandler(repo domain.ChatLinkRepository, log *logger.Logger) *ScrapperHandler {
-	return &ScrapperHandler{repository: repo, Logger: log}
+func NewScrapperHandler(transactor Transactor, repo domain.ChatLinkRepository, log *logger.Logger) *ScrapperHandler {
+	return &ScrapperHandler{
+		transactor: transactor,
+		repository: repo,
+		Logger:     log,
+	}
 }
 
 // Register chat.
@@ -106,7 +116,10 @@ func (h *ScrapperHandler) PostLinks(ctx echo.Context, params scrappertypes.PostL
 		return SendBadRequestResponse(ctx, ErrInternalError, ErrDescriptionInternalError)
 	}
 
-	if err := h.repository.SaveLink(ctx.Request().Context(), params.TgChatId, link); err != nil {
+	err = h.transactor.WithTransaction(ctx.Request().Context(), func(ctx context.Context) error {
+		return h.repository.SaveLink(ctx, params.TgChatId, link)
+	})
+	if err != nil {
 		h.Logger.Error("Failed to save link for chat", "ID", params.TgChatId, "error", err)
 		return SendBadRequestResponse(ctx, ErrInternalError, ErrDescriptionInternalError)
 	}
@@ -159,7 +172,14 @@ func (h *ScrapperHandler) DeleteLinks(ctx echo.Context, params scrappertypes.Del
 func (h *ScrapperHandler) GetLinks(ctx echo.Context, params scrappertypes.GetLinksParams) error {
 	h.Logger.Info("Getting links for chat", "ID", params.TgChatId)
 
-	links, err := h.repository.GetListLinks(ctx.Request().Context(), params.TgChatId)
+	links, err := func() ([]*domain.Link, error) {
+		if params.Tag != nil && *params.Tag != "" {
+			return h.repository.GetLinksByTag(ctx.Request().Context(), params.TgChatId, *params.Tag)
+		}
+
+		return h.repository.GetListLinks(ctx.Request().Context(), params.TgChatId)
+	}()
+
 	if err != nil {
 		h.Logger.Error("Failed to get links for chat", "ID", params.TgChatId, "error", err)
 		return SendBadRequestResponse(ctx, ErrInternalError, ErrDescriptionInternalError)

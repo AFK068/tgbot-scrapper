@@ -8,10 +8,6 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-type Transactor interface {
-	WithTransaction(ctx context.Context, txFunc func(ctx context.Context) error) error
-}
-
 type txKey struct{}
 
 func injectTx(ctx context.Context, tx pgx.Tx) context.Context {
