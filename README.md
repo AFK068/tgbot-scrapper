@@ -1,3 +1,8 @@
+![Coverage](https://img.shields.io/badge/coverage-38%25-brightgreen.svg)
+![Build](https://img.shields.io/badge/build-passing-brightgreen.svg)
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
+
 ## About
 
 This Telegram bot monitors the latest activity on GitHub repositories, such as issues and pull requests, as well as Stack Overflow questions, including answers and comments.
